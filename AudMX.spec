@@ -5,13 +5,14 @@ a = Analysis(
     ['AudMX.py'],
     pathex=[],
     binaries=[],
-    datas=[('B_sylete', '.'), ('W_sylete', '.'), ('icon.png', '.'), ('ini.txt', '.')],
+    datas=[('B_sylete', '.'), ('W_sylete', '.'), ('iconTrayB.png', '.'), ('iconTrayW.png', '.'), ('ini.txt', '.'), ('msvcp140d.dll', '.'), ('ucrtbased.dll', '.'), ('vcruntime140_1d.dll', '.'), ('vcruntime140d.dll', '.'), ('volumepid.exe', '.')],
     hiddenimports=['pycaw', 'Pillow', 'ctype', 'pywin32', 'PySide6'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
+    optimize=0,
 )
 pyz = PYZ(a.pure)
 
@@ -28,7 +29,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
