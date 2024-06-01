@@ -1,10 +1,14 @@
 
 import os
 from PIL import Image
-from volume_socket import SocketVolume
+from Bobla_lib.volume_socket import SocketVolume
 import sys
 from PySide6.QtCore import  QTimer
 class IconCl(object):
+    """
+    This class represents an icon object for AdMX. the object contains all the properties of the icon.
+    """
+
     __icon = []
     __num = -1
     __state = -1
@@ -22,6 +26,10 @@ class IconCl(object):
             self.__name = path[path.rindex("__")+2:-3] + "exe"
     @property
     def icon(self):
+        """
+        property icon is icon
+        :return: bytes array icon
+        """
         if (self.__icon == []):
             if self.__path == None:
                 self.__icon = bytes([0]) * 352
@@ -76,6 +84,13 @@ class IconCl(object):
 
 
 class IcomReader():
+    """
+    This class represents an array icons object.  To create
+    :py:class:`~IcomReader.loadIcons` objects, use the appropriate factory
+    functions.
+
+    * :py:func:`~IcomReader.setLastLevel`
+    """
     # __icon_mass = []
 
     @staticmethod
@@ -185,21 +200,24 @@ class VaveLight():
     #     self.timer.setInterval(33)
     #     self.timer.start()
     def __sendCom(self):
+
         com = ""
         for it in self.volume:
-            com += str(it) + "|"
-        self.__serW("VOL:"+ com[:-1])
+            com += str(it*5) + "|"
+        self.__serW("VOL:"+ com[:-1] + "\n\r")
     def avtoUpdateStop(self):
         self.timer.stop()
+        self.timer.blockSignals(True)
     def avtoUpdateStart(self):
         self.timer.start()
+        self.timer.blockSignals(False)
 
     def updateList(self,  mas_icon: list[IconCl]):
         new_pid = [icon.pid for icon in mas_icon]
         if len(new_pid) == len(self.__old_pid) + 1:
             for i in range(len(self.__old_pid)):
                 if self.__old_pid[i] != new_pid[i]:
-                    self.__mas_vol_socket.insert(i,SocketVolume(mas_icon[i].pid))
+                    self.__mas_vol_socket.insert(i, SocketVolume(mas_icon[i].pid))
                     return
         elif len(new_pid) == len(self.__old_pid) - 1:
             for i in range(len(self.__old_pid)):
@@ -207,6 +225,13 @@ class VaveLight():
                     self.__mas_vol_socket[i].stop()
                     self.__mas_vol_socket.pop(i)
                     return
+    def stop(self):
+
+        for vl in self.__mas_vol_socket:
+            if vl[2] != -1:
+                print(vl)
+                vl[1].stop()
+        self.__mas_vol_socket.clear()
 
 
 

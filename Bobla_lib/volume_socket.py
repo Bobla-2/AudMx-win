@@ -15,11 +15,11 @@ class SocketVolume():
             return self.__count
         else:
             return -1.0
-    def __str__(self):
-        if (self.__call_back == None):
-            return str(self.__count)
-        else:
-            return "set callback"
+    # def __str__(self):
+    #     if (self.__call_back == None):
+    #         return str(self.__count)
+    #     else:
+    #         return "set callback"
 
 
     def __init__(self, pid: int, call_back = None):
@@ -42,7 +42,7 @@ class SocketVolume():
         self.__udp_thread.start()
 
     def __udp_client(self):
-        command = [".\\volumepid.exe", str(self.__pid), str(self.__dst_port)]
+        command = [".\\Bobla_lib\\volumepid.exe", str(self.__pid), str(self.__dst_port)]
         self.__process = subprocess.Popen(command, stdout=subprocess.PIPE)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
