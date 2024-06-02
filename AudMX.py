@@ -1,32 +1,20 @@
 from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume, IAudioEndpointVolume
-from PIL import Image
-import os
 import sys
-import ctype
 import win32con
 import win32api
-from PySide6.QtGui import QWindow
-from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtSerialPort import QSerialPort, QSerialPortInfo
-from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QMessageBox
-from PySide6.QtCore import QIODevice, QTimer, QObject, Signal
-from PySide6.QtGui import QIcon
-# from serra.serialLib import seriall, SerCDC
-from Bobla_lib.serialLib import seriall, SerCDC
-from Bobla_lib import setStyle_Black_Or_White
+from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
+from PySide6.QtCore import QTimer, Signal, QCoreApplication, QPoint
+from Bobla_lib.serialLib import SerCDC
 from comtypes import CLSCTX_ALL
-# from avto_run_settings import AvtoRun
-from Bobla_lib.volume_socket import SocketVolume
 from Bobla_lib.icon_manager import IcomReader, VaveLight
 from enum import Enum
 from Bobla_lib.setting_menu import MenuSettings
-from PyQt5.QtCore import QCoreApplication
-from Bobla_lib.windows_thames import AutoUpdateStile, ThemesWindows
+from module.theme.windows_thames import AutoUpdateStile
+from PySide6.QtGui import  QCursor
 
-
-ORGANIZATION_NAME = 'sas'
+ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
-APPLICATION_NAME = 'AudMX'
+APPLICATION_NAME = 'AudMX v1'
 SETTINGS_TRAY = 'settings'
 # class syntax
 class LIGHT_MODE(Enum):
@@ -36,75 +24,49 @@ class LIGHT_MODE(Enum):
     VOLUME_LEVEL = 4
     WAVE = 5
 
-# functional syntax
-
-
-
 theme = int
-class SystemTrayIcon(QtWidgets.QSystemTrayIcon):           #класс приложения в трее
+class SystemTrayIcon(QSystemTrayIcon):           #класс приложения в трее
     flag_warning = True
-    __flag_auto_boot = 0
     SignalLIghtMode = Signal(int)
-    SignalLIght1 = Signal()
-    SignalLIght2 = Signal()
-    SignalLIght3 = Signal()
-
+    SignalActSet = Signal()
+    SignalButtonExit = Signal()
     def __init__(self, parent=None):
-
-        QtWidgets.QSystemTrayIcon.__init__(self, parent)
-        # self.setIcon(0)
-        # self.__flag_auto_boot = auto_boot_flag
-
-        self.menu = QtWidgets.QMenu(parent)
+        QSystemTrayIcon.__init__(self, parent)
+        self.setToolTip("AudMX")
+        self.menu = QMenu(parent)
 
         self.menu_light = self.menu.addMenu("light")
-        # if (self.__flag_auto_boot == 0):
-        #     self.avto_boot_action = self.menu.addAction("ON auto boot")
-        # else:
-        #     self.avto_boot_action = self.menu.addAction("OFF auto boot")
         self.settings = self.menu.addAction("setting")
-        self.Action1 = self.menu.addAction("off warning")
         self.Action2 = self.menu.addAction("Action2")
         self.exitAction = self.menu.addAction("EXIT")
-
 
         self.Action_light1 = self.menu_light.addAction("white")
         self.Action_light2 = self.menu_light.addAction("wave")
         self.Action_light3 = self.menu_light.addAction("volume_level")
 
         self.setContextMenu(self.menu)
-        self.Action_light1.triggered.connect(lambda :self.SignalLIghtMode.emit(LIGHT_MODE.WHITE.value))
-        self.Action_light2.triggered.connect(lambda :self.SignalLIghtMode.emit(LIGHT_MODE.WAVE.value))
-        self.Action_light3.triggered.connect(lambda :self.SignalLIghtMode.emit(LIGHT_MODE.VOLUME_LEVEL.value))
-        # self.avto_boot_action.triggered.connect(self.avtoBootAction)
+        self.Action_light1.triggered.connect(lambda : self.SignalLIghtMode.emit(LIGHT_MODE.WHITE.value))
+        self.Action_light2.triggered.connect(lambda : self.SignalLIghtMode.emit(LIGHT_MODE.WAVE.value))
+        self.Action_light3.triggered.connect(lambda : self.SignalLIghtMode.emit(LIGHT_MODE.VOLUME_LEVEL.value))
         self.exitAction.triggered.connect(self.exit)
-        self.Action1.triggered.connect(self.action1)
         self.Action2.triggered.connect(self.action2)
-        self.settings.triggered.connect(lambda : MenuSettings(SETTINGS_TRAY, APPLICATION_NAME))
+        self.settings.triggered.connect(self.actSet)
+        self.activated.connect(self.onTrayIconActivated)
+
+    def onTrayIconActivated(self, reason):
+        if reason == QSystemTrayIcon.Trigger:  # Left click
+            cursor_position = QCursor.pos()
+            # self.menu.show()#(QPoint(cursor_position.x(), cursor_position.y() - 110))
+            # self.menu.popup(QPoint(cursor_position.x(), cursor_position.y() - 110))
+    def actSet(self):
+        self.SignalActSet.emit()
+
     def setFont(self, font):
         self.exitAction.setFont(font)
-        self.Action1.setFont(font)
         self.Action2.setFont(font)
 
     def exit(self):
-        QtCore.QCoreApplication.exit()
-    # def avtoBootAction(self):
-    #     self.__flag_auto_boot = not self.__flag_auto_boot
-    #     if (self.__flag_auto_boot == 0):
-    #         self.avto_boot_action.setText("ON auto boot")
-    #         AvtoRun.removeAppToAvtoRun("AudMX")
-    #     else:
-    #         self.avto_boot_action.setText("OFF auto boot")
-    #         AvtoRun.addAppToAvtoRun("AudMX", sys.argv[0])
-
-        
-    def action1(self):
-        if self.flag_warning:
-            self.Action1.setText("on warning")
-            self.flag_warning = False
-        else:
-            self.Action1.setText("off warning")
-            self.flag_warning = True
+        self.SignalButtonExit.emit()
 
     def action2(self):
         if self.flag_warning:
@@ -112,24 +74,8 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):           #класс прил�
     def masegeIconWarning(self, file_name: str):
         if self.flag_warning:
             self.showMessage("ERROR ICON", "icon: '" + file_name + "' don't have size 60x44px")
-    # def action_light1(self):
-    #     self.SignalLIght1.emit()
-    #
-    # def action_light2(self):
-    #     self.SignalLIght2.emit()
-    #
-    # def action_light3(self):
-    #     self.SignalLIght3.emit()
-    # def setIcon(self, Theme: bool) -> None:
-    #     if Theme == 0:
-    #         icon = QIcon(os.path.abspath(
-    #             os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))), 'iconTrayB.png')))
-    #     else:
-    #         icon = QIcon(os.path.abspath(
-    #             os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))), 'iconTrayW.png')))
-    #     super().setIcon(icon)
 
-class MainClass(QtWidgets.QWidget):
+class MainClass(QWidget):
     volLevelApp = []
     __light_mode = -1
 
@@ -138,8 +84,6 @@ class MainClass(QtWidgets.QWidget):
     teat_perer = 0
     open_process_list = []
     __comand_Buff = ''
-    # ser_work = 0
-    # mas_icon = []
 
     __count_presed_button = 0
     dictVolumeDBtoProsent = [-65.25,
@@ -245,31 +189,43 @@ class MainClass(QtWidgets.QWidget):
     def __init__(self):
         super(MainClass, self).__init__()
 
-
-        # icon = QIcon(os.path.abspath(os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))), 'iconTrayB.png')))
-        #icon = QIcon(sys.argv[0][:sys.argv[0].rindex("\\")] + "\\icon.png")
-        self.trayIcon = SystemTrayIcon( self)
+        self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
+        self.trayIcon.flag_warning = MenuSettings.readVarningMode(SETTINGS_TRAY)
         self.trayIcon.SignalLIghtMode.connect(lambda mode : self.handleSignalLIghtMode(mode))
-        pid, vid = self.readINIfile()
-        # self.ser = seriall()
+        self.cl_set = {}
+        self.trayIcon.SignalActSet.connect(lambda : MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.styleSheet(), self.setSettings))
+        self.trayIcon.SignalButtonExit.connect(self.exitApp)
+
         self.ser = SerCDC(True)
         self.ser.setHanglerRead(self.hanglerReadSer)
         # self.audioSessions = AudioUtilities.GetAllSessions()
 
         self.timer_2 = QTimer()
-        self.timer_2.timeout.connect(self.updateStyleUI)
+        self.timer_2.timeout.connect(self.update_)
         self.timer_2.setInterval(5000)
         self.timer_2.start()
-        self.updateStyleUI()
+        self.update_()
         self.upDateListOpenProcces()
         self.icon_mass = []
+        self.timer_setIconNum = QTimer()
+        self.timer_setIconNum.timeout.connect(self.setIconNum)
+        self.timer_setIconNum.setInterval(250)
 
+        pid = 4097
+        vid = 12346
         self.ser.SignalSerialStartOk.connect(self.startMassege)
         self.ser.autoConnect(vid, pid, 1000000, True)
         self.avto_udate_theme = AutoUpdateStile()
-        self.avto_udate_theme.appendedCallback(self.setStyleSheet,"W_sylete", "B_sylete", "CSS")
+        self.avto_udate_theme.theme = MenuSettings.readThemeMode(SETTINGS_TRAY)
+        self.avto_udate_theme.appendedCallback(self.setStyleSheet, "W_sylete", "B_sylete", "CSS")
         self.avto_udate_theme.appendedCallback(self.trayIcon.setIcon, "iconTrayW.png", "iconTrayB.png", "ICON")
+        self.flag_setIconNum = 0
+    def setSettings(self, set: dict):
+        if 'warning' in set:
+            self.trayIcon.flag_warning = set["warning"]
+        if 'theme' in set:
+            self.avto_udate_theme.theme = set["theme"]
 
 
     def hanglerReadSer(self, iner: str):
@@ -281,10 +237,14 @@ class MainClass(QtWidgets.QWidget):
                 self.levelVolHandle(iner)
         elif iner.find("OK") != -1:
             if self.num_load_icon != -1:
-                self.loadIconOnESP(1)
+                if self.flag_setIconNum == 1:
+                    print("self.loadIconOnESP(1)--hanglerReadSer")
+                    self.loadIconOnESP(1)
         elif iner.find("ERROR: -1") != -1:
-            if self.num_load_icon != -1:
-                self.loadIconOnESP(0)
+            if self.flag_setIconNum == 1:
+                if self.num_load_icon != -1:
+                    print("self.loadIconOnESP(0)--hanglerReadSer")
+                    self.loadIconOnESP(0)
         elif iner.find("Send 352 bytes") != -1:
             self.handleGetIcon()
 
@@ -292,53 +252,26 @@ class MainClass(QtWidgets.QWidget):
         # a = AudioUtilities.GetAllSessions()
         self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
 
-    def updateStyleUI(self):
+    def update_(self):
         """
         #функция вызываеммая таймером и обновляющяя стиль приложения
         :return: None
         """
-        # global theme
-        # cssStyle, themeBW = setStyle_Black_Or_White.getStyleBW()
-        # if theme != themeBW:
-        #     self.setStyleSheet(cssStyle)
-        #     self.trayIcon.setIcon(themeBW)
-
         if (self.ser.doesSerWork == 1):
             self.upDateListOpenProcces()
             if (self.last_process_list != self.open_process_list):
-                # self.__tmp_icon_mass = []
                 IcomReader.setLastLevel(self.icon_mass, 0)
-                # if (self.__tmp_icon_mass != self.icon_mass):
-                # self.icon_mass = self.__tmp_icon_mass
                 self.volLevelApp = []
                 self.last_process_list = self.open_process_list
                 tempp = IcomReader.loadIcons(sys.argv[0][:sys.argv[0].rindex("\\")] + ".\\icon", self.open_process_list, 5)
                 if ([i.name for i in tempp] != [i.name for i in self.icon_mass]):
                     self.icon_mass = tempp
-                    # print([t.num for t in tempp])
-                # self.upDateListMasIcon()
                     self.ser.clearnQuwewe()
                     self.ser.clearnSend()
+                    if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
+                        self.valve_light.updateList(self.icon_mass)
+                    print("self.loadIconOnESP(1)--update_")
                     self.loadIconOnESP(1)
-                    print("updateStyleUI")
-
-    def readINIfile(self):
-        """
-        #читает ини файл с некоторыми наситройками
-        :return: None
-        """
-        #with open(sys.argv[0][:sys.argv[0].rindex("\\")] + '\\ini.txt') as f:
-        with open(os.path.abspath(os.path.join(getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__))), 'ini.txt'))) as f:
-            lines = f.readlines()
-        if len(lines) > 1:
-            if lines[0].find("PID=") != -1 and lines[1].find("VID=") != -1:
-                return int(lines[0][4:-1]), int(lines[1][4:])
-            else:
-                self.trayIcon.showMessage("ERROR", "ERROR don't current PID/VID")
-                return 99999, 99999
-        else:
-            self.trayIcon.showMessage("ERROR", "ERROR don't search ini.txt or current PID/VID")
-            return 99999, 99999
 
     def keyPleerHandle(self, comand: str) -> None:
         """
@@ -398,13 +331,11 @@ class MainClass(QtWidgets.QWidget):
                     if session.Process and session.Process.name() == self.icon_mass[i].name:
                         volume = session._ctl.QueryInterface(ISimpleAudioVolume)
                         volume.SetMasterVolume(float(self.icon_mass[i].volume_level) / 100, None)
-                        # self.volLevelApp[num_app][1] = True
-                        # break
                     elif (self.icon_mass[i].name == "system" and str(session)[
                         -5] == 'DisplayName: @%SystemRoot%\System32\AudioSrv.Dll'):
                         volume = session._ctl.QueryInterface(ISimpleAudioVolume)
                         volume.SetMasterVolume(float(self.icon_mass[i].volume_level) / 100, None)
-                        # self.volLevelApp[num_app][1] = True
+
     def handleSignalLIghtMode(self, mode: int):
         if mode == LIGHT_MODE.WHITE.value:
             self.__light_mode = LIGHT_MODE.WHITE
@@ -418,48 +349,58 @@ class MainClass(QtWidgets.QWidget):
             self.valve_light = VaveLight(self.icon_mass, self.ser.writeSerial)
             self.valve_light.avtoUpdateStart()
         else:
-            self.valve_light.stop()
-
+            if self.valve_light != None:
+                self.valve_light.stop()
 
     def startMassege(self):
         """
         #вызываеться послесигнала о подключении и запускает перврначальную настройку(записывает картинки в микщер)
         :return:
         """
-        # self.ser_work = 1
-        # self.timer_ser_con.stop()
         self.last_process_list = []
         self.icon_mass.clear()
         self.num_load_icon = -1
 
-        # self.loadIconOnESP()
-
     def loadIconOnESP(self, ans=0):
+        print(self.num_load_icon)
         self.num_load_icon = self.num_load_icon + ans
+        print(self.num_load_icon)
         if self.num_load_icon == -1:
             return
         if self.num_load_icon == 0:
+            self.timer_setIconNum.start()
+
             if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
                 self.valve_light.avtoUpdateStop()
                 print("avtoUpdateStop")
+                return
+        print(self.num_load_icon)
         if (self.num_load_icon == 5):
             self.num_load_icon = -1
+            self.flag_setIconNum = 0
             if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
                 self.valve_light.avtoUpdateStart()
-            # self.mas_icon.clear()
             return
+        self.setIconNum()
+
+    def setIconNum(self):
         self.ser.writeSerial("SET_ICON " + str(self.icon_mass[self.num_load_icon].num) + "\n")
+        self.flag_setIconNum = 1
+        self.timer_setIconNum.stop()
 
     def handleGetIcon(self):
         self.ser.writeByteSerial(self.icon_mass[self.num_load_icon].icon)
 
+    def exitApp(self):
+        if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
+            self.valve_light.stop()
+        QCoreApplication.exit()
 
 if __name__ == '__main__':
-    QCoreApplication.setApplicationName(ORGANIZATION_NAME)
+    QCoreApplication.setOrganizationName(ORGANIZATION_NAME)
     QCoreApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
     QCoreApplication.setApplicationName(APPLICATION_NAME)
-    app = QApplication(sys.argv)
-    # run_only_one_instance(app)
+    app = QApplication(sys.argv + ['-platform', 'windows:darkmode=1'])
     app.setQuitOnLastWindowClosed(False)
     window = MainClass()
     sys.exit(app.exec())

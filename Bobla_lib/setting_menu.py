@@ -1,49 +1,91 @@
 import sys
-from PySide6.QtWidgets import QCheckBox, QLabel, QPushButton, QComboBox, QDialog, QGridLayout
+from PySide6.QtWidgets import QCheckBox, QLabel, QPushButton, QComboBox, QDialog, QGridLayout, QApplication
 from PySide6.QtCore import QSettings
+from PySide6.QtGui import QFont
+from typing import Callable, Dict, Any
 
 class MenuSettings(QDialog):
     __set_tray = ""
     __app_name = ""
 
-    def __init__(self, set_tray: str, app_name: str, parent=None):
+    def __init__(self, set_tray: str, app_name: str, style: str, func: Callable[[Dict[str, Any]], Any],  parent=None):
         super().__init__(parent)
+        self.cl = func
         self.__set_tray = set_tray
         self.__app_name = app_name
+        self.setStyleSheet(style)
+        font = QFont()
+        font.setFamily("Yu Gothic UI Semibold")
+        font.setPointSize(int(12))
+        self.setFont(font)
 
         self.__check_box_1 = QCheckBox()
+        self.__check_box_1.setFont(font)
         self.__check_box_1_lb = QLabel("Авто старт")
+        self.__check_box_1_lb.setFont(font)
+        self.__check_box_2 = QCheckBox()
+        self.__check_box_2.setFont(font)
+        self.__check_box_2_lb = QLabel("Уведомления")
+        self.__check_box_2_lb.setFont(font)
         self.__set_theme_1 = QComboBox()
+        self.__set_theme_1.setFont(font)
         self.__set_theme_1.addItems(["системная", "светлая", "темная"])
         self.__set_theme_1_lb = QLabel("тема")
-
+        self.__set_theme_1_lb.setFont(font)
         self.__button = QPushButton("Сохранить")
+        self.__button.clicked.connect(self.__safeSettingsApp)
+        self.__button.setFont(font)
+
         self.__layout = QGridLayout()
-        self.__layout.addWidget(self.__check_box_1, 1, 0, 1, 1)
-        self.__layout.addWidget(self.__check_box_1_lb, 2, 0, 1, 1)
-        self.__layout.addWidget(self.__set_theme_1, 2, 0, 1, 1)
-        self.__layout.addWidget(self.__set_theme_1_lb, 2, 1, 1, 1)
-        self.__layout.addWidget(self.__button, 3, 0, 1, 2)
+        self.__layout.addWidget(self.__check_box_1, 1, 1, 1, 1)
+        self.__layout.addWidget(self.__check_box_1_lb, 1, 0, 1, 1)
+        self.__layout.addWidget(self.__check_box_2, 2, 1, 1, 1)
+        self.__layout.addWidget(self.__check_box_2_lb, 2, 0, 1, 1)
+        self.__layout.addWidget(self.__set_theme_1, 3, 1, 1, 1)
+        self.__layout.addWidget(self.__set_theme_1_lb, 3, 0, 1, 1)
+        self.__layout.addWidget(self.__button, 4, 0, 1, 2)
         self.setLayout(self.__layout)
 
         self.__set_theme_1.setCurrentText(QSettings().value(self.__set_tray + "/theme", False, type=str))
+        self.__check_box_2.setChecked(QSettings().value(self.__set_tray + "/warning", False, type=int))
         self.__check_box_1.setChecked(AvtoRunStatic.readAppToAvtoRun(self.__app_name))
-
         if self.exec_() == QDialog.DialogCode.Accepted:
-            self.__safeSettings()
+            pass
         self.deleteLater()
 
     def __safeSettingsApp(self):
         settings = QSettings()
-        settings.setValue(self.__set_tray + "/theme", self.set_theme_1.currentText())
+        settings.setValue(self.__set_tray + "/theme", self.__set_theme_1.currentText())
+        print(self.__check_box_2.isChecked())
+        settings.setValue(self.__set_tray + "/warning", int(self.__check_box_2.isChecked()))
         settings.sync()
         if (self.__check_box_1.isChecked() == 0):
             AvtoRunStatic.removeAppToAvtoRun(self.__app_name)
         else:
             AvtoRunStatic.addAppToAvtoRun(self.__app_name, sys.argv[0])
+        tmp = {}
+        tmp["warning"] = self.__check_box_2.isChecked()
+        if self.__set_theme_1.currentText() == "темная":
+            tmp["theme"] = "black"
+        elif self.__set_theme_1.currentText() == "светлая":
+            tmp["theme"] = "white"
+        else:
+            tmp["theme"] = "system"
+        self.cl(tmp)
 
-    def readThemeMode(self) -> str:
-        return QSettings().settings.value(self.__set_tray + "/theme", False, type=str)
+    @staticmethod
+    def readThemeMode(__set_tray) -> str:
+        tm = QSettings().value(__set_tray + "/theme", False, type=str)
+        if tm == "темная":
+            return "black"
+        elif tm == "светлая":
+            return "white"
+        else:
+            return "system"
+
+    @staticmethod
+    def readVarningMode(__set_tray) -> str:
+        return QSettings().value(__set_tray + "/warning", False, type=int)
 
 
 class AvtoRunStatic():
@@ -64,9 +106,6 @@ class AvtoRunStatic():
         settings = QSettings(AvtoRunStatic.__RUN_PATH, QSettings.NativeFormat)
         return settings.contains(name_app)
 
-
-from PyQt5.QtGui import QWindow
-from PyQt5.QtWidgets import QApplication
 
 class Monitor():
     @staticmethod

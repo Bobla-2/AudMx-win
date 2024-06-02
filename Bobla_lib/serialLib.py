@@ -1,6 +1,6 @@
-# import time
 from PySide6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PySide6.QtCore import QIODevice, Signal, QObject, QTimer
+
 
 class seriall(QObject):
     SignalReadPort = Signal(list)
@@ -57,7 +57,6 @@ class seriall(QObject):
             if (self.__flag_reconnect == True):
                 self.__timer_avto_connect.start()
 
-
     def readPort(self):
         """
         #
@@ -94,17 +93,13 @@ class seriall(QObject):
 
         self.SignalSerialStartOk.emit()
 
-
-
     def readInpurAndOutput(self):
         """
         #оброботчик всех приходящих пакетов
         при командах вызывает соответствующие сигналы
         :return: None
         """
-        # inputSrt = self.serial.readLine()
         inputSrtB = self.__serial.readAll()
-
 
         if (self.__flag_do_read == 1):
             self.__inputSrt += str(inputSrtB, 'utf-8')
@@ -120,25 +115,10 @@ class seriall(QObject):
         self.__inputSrt = self.__inputSrt[:self.__inputSrt.find("\n")]
         print("ser read: ", self.__inputSrt)
 
-        # temp = inputSrt[0:self.__inputSrt.find("\n")]
-        # inputSrt = temp
         try:
             self.__handleRead(self.__inputSrt)
         except:
             print("NO SET HANDLER!!!!!!!!")
-
-        # if self.__inputSrt.find("BUTTON:") != -1:
-        #     self.SignalReadButton.emit(self.__inputSrt)
-        # elif self.__inputSrt.find("|") != -1:
-        #     if (self.__inputSrt != self.__comand_Buff):
-        #         self.__comand_Buff = self.__inputSrt
-        #         self.SignalReadVoluem.emit(self.__inputSrt)
-        # elif self.__inputSrt.find("OK") != -1:
-        #     self.SignalSetIcon.emit(0)
-        # elif self.__inputSrt.find("ERROR: -1") != -1:
-        #     self.SignalSetIcon.emit(-1)
-        # elif self.__inputSrt.find("Send 352 bytes") != -1:
-        #     self.SignalGetIcon.emit()
 
     def closeSerial(self):
         self.__serial.close()
@@ -192,20 +172,14 @@ class SerCDC(seriall):
         if self.__flag_cdc == False:
             super().writeByteSerial(iner)
         self.__quwewe_write.append([iner, False])
-        # self.__last_write = iner
-        # self.__count_packeg = (len(iner) / 64) + 1
-        # self.__load64Byte()
         self.__timer_cdc.start()
 
-        # self.__serial.write(bytes(iner))
     def clearnQuwewe(self):
         self.__quwewe_write.clear()
 
     def clearnSend(self):
         self.__num_packeg = 99
         self.__last_write = 0
-
-
 
     def __load64Byte(self):
         if self.__num_packeg < self.__count_packeg:
@@ -219,7 +193,7 @@ class SerCDC(seriall):
             self.__count_packeg = 0
             self.__last_write = 0
             if len(self.__quwewe_write) != 0:
-                self.__last_write = self.__quwewe_write.pop()
+                self.__last_write = self.__quwewe_write.pop(0)
                 self.__count_packeg = int((len(self.__last_write[0]) / 64)) + 1
                 if self.__count_packeg == 1:
                     self.__load64Byte()

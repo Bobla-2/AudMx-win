@@ -1,9 +1,9 @@
 
 import os
 from PIL import Image
-from Bobla_lib.volume_socket import SocketVolume
+from module.volume_soket.volume_socket import SocketVolume
 import sys
-from PySide6.QtCore import  QTimer
+from PySide6.QtCore import QTimer
 class IconCl(object):
     """
     This class represents an icon object for AdMX. the object contains all the properties of the icon.
@@ -134,44 +134,6 @@ class IcomReader():
     def setLastLevel(mas: list[IconCl], level: int):
         for ms in mas:
             ms.last_volume_level = level
-    # @staticmethod
-    # def startSocketVol(mas: list[IconCl]):
-    #     for ms in mas:
-    #         ms.startSocket()
-    #
-    # @staticmethod
-    # def stopSocketVol(mas: list[IconCl]):
-    #     for ms in mas:
-    #         ms.stopSocket()
-
-
-
-# t = IcomReader().loadIcons(sys.argv[0][:sys.argv[0].rindex("\\")] + ".\\icon", ['Discord.exe', 'chrome.exe', 'steam.exe', 'Discord.exe', 'steamwebhelper.exe', 'Telegram.exe', 'master.exe', 'system.exe'])
-#
-# print("123")
-    #
-    #
-    #
-    #
-# def loadIconOnESP(self, ans=0):
-#     self.num_load_icon = self.num_load_icon + ans
-#     if (self.num_load_icon == 5):
-#         self.num_load_icon = 0
-#         self.mas_icon.clear()
-#         return
-#     self.ser.writeSerial("SET_ICON " + str(self.mas_icon[self.num_load_icon][1]) + "\n")
-#     self.timer_loadByte.start()
-#
-# def handleGetIcon(self):
-#     self.timer_loadByte.start()
-# def loadByteMasToESP(self):
-#     self.teat_perer += 1
-#     #/print(len(self.mas_icon[self.num_load_icon][0][(self.teat_perer - 1) * 64:self.teat_perer * 64]) , self.teat_perer, self.num_load_icon)
-#     self.ser.writeByteSerial(self.mas_icon[self.num_load_icon][0][(self.teat_perer - 1) * 64:self.teat_perer * 64])
-#     if (self.teat_perer == 6):
-#         self.timer_loadByte.stop()
-#         self.teat_perer = 0
-#         self.num_load_icon += 1
 
 
 class VaveLight():
@@ -203,7 +165,10 @@ class VaveLight():
 
         com = ""
         for it in self.volume:
-            com += str(it*5) + "|"
+            com += str(it*3) + "|"
+        print(self.__mas_vol_socket)
+
+
         self.__serW("VOL:"+ com[:-1] + "\n\r")
     def avtoUpdateStop(self):
         self.timer.stop()
@@ -214,17 +179,18 @@ class VaveLight():
 
     def updateList(self,  mas_icon: list[IconCl]):
         new_pid = [icon.pid for icon in mas_icon]
-        if len(new_pid) == len(self.__old_pid) + 1:
+        if len(new_pid) == len(self.__old_pid):
             for i in range(len(self.__old_pid)):
                 if self.__old_pid[i] != new_pid[i]:
-                    self.__mas_vol_socket.insert(i, SocketVolume(mas_icon[i].pid))
-                    return
-        elif len(new_pid) == len(self.__old_pid) - 1:
-            for i in range(len(self.__old_pid)):
-                if self.__old_pid[i] != new_pid[i]:
-                    self.__mas_vol_socket[i].stop()
-                    self.__mas_vol_socket.pop(i)
-                    return
+                    del self.__mas_vol_socket[i]
+                    self.__mas_vol_socket.insert(i, [i, SocketVolume(mas_icon[i].pid), 0.])
+                    # return
+        # elif len(new_pid) == len(self.__old_pid) - 1:
+        #     for i in range(len(self.__old_pid)):
+        #         if self.__old_pid[i] != new_pid[i]:
+        #             self.__mas_vol_socket[i].stop()
+        #             self.__mas_vol_socket.pop(i)
+        #             return
     def stop(self):
 
         for vl in self.__mas_vol_socket:
