@@ -7,13 +7,13 @@ class seriall(QObject):
     SignalSerialRegOk = Signal()
     SignalSerialStartOk = Signal()
     SignalError = Signal(str)
-    SignalInvalidComand = Signal()
-    SignalReadFinish = Signal(list)
-    SignalReadLine = Signal(str)
-    SignalReadButton = Signal(str)
-    SignalReadVoluem = Signal(str)
-    SignalSetIcon = Signal(int)
-    SignalGetIcon = Signal()
+    # SignalInvalidComand = Signal()
+    # SignalReadFinish = Signal(list)
+    # SignalReadLine = Signal(str)
+    # SignalReadButton = Signal(str)
+    # SignalReadVoluem = Signal(str)
+    # SignalSetIcon = Signal(int)
+    # SignalGetIcon = Signal()
     __productIdentifier = 0
     __vendorIdentifier = 0
     __BaudRate = 0
@@ -157,18 +157,25 @@ class SerCDC(seriall):
     @mod_CDC.setter
     def mod_CDC(self, mod: bool):
         self.__flag_cdc = mod
+    @property
+    def __isSerWork(self):
+        if self.__ser_work == False:
+            self.__timer_cdc.stop()
+            self.__quwewe_write.clear()
+            return False
+        return True
 
     def writeSerial(self, iner: str):
+        if self.__isSerWork == False:
+            return
         if self.__flag_cdc == False:
             super().writeSerial(iner)
         else:
-
-            self.__quwewe_write.append([iner , True])
-            # self.__last_write = iner
-            # self.__count_packeg = (len(iner) / 64) + 1
-            # self.__load64Byte()
+            self.__quwewe_write.append([iner, True])
             self.__timer_cdc.start()
     def writeByteSerial(self, iner: bytes):
+        if self.__isSerWork == False:
+            return
         if self.__flag_cdc == False:
             super().writeByteSerial(iner)
         self.__quwewe_write.append([iner, False])

@@ -7,73 +7,17 @@ from PySide6.QtCore import QTimer, Signal, QCoreApplication, QPoint
 from Bobla_lib.serialLib import SerCDC
 from comtypes import CLSCTX_ALL
 from Bobla_lib.icon_manager import IcomReader, VaveLight
-from enum import Enum
+
 from Bobla_lib.setting_menu import MenuSettings
 from module.theme.windows_thames import AutoUpdateStile
-from PySide6.QtGui import  QCursor
+from PySide6.QtGui import QCursor
+from module.tray.trayApp import SystemTrayIcon
+from module.ENUM.enums import LIGHT_MODE
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
 APPLICATION_NAME = 'AudMX v1'
 SETTINGS_TRAY = 'settings'
-# class syntax
-class LIGHT_MODE(Enum):
-    WHITE = 1
-    BLACK = 2
-    RGB = 3
-    VOLUME_LEVEL = 4
-    WAVE = 5
-
-theme = int
-class SystemTrayIcon(QSystemTrayIcon):           #класс приложения в трее
-    flag_warning = True
-    SignalLIghtMode = Signal(int)
-    SignalActSet = Signal()
-    SignalButtonExit = Signal()
-    def __init__(self, parent=None):
-        QSystemTrayIcon.__init__(self, parent)
-        self.setToolTip("AudMX")
-        self.menu = QMenu(parent)
-
-        self.menu_light = self.menu.addMenu("light")
-        self.settings = self.menu.addAction("setting")
-        self.Action2 = self.menu.addAction("Action2")
-        self.exitAction = self.menu.addAction("EXIT")
-
-        self.Action_light1 = self.menu_light.addAction("white")
-        self.Action_light2 = self.menu_light.addAction("wave")
-        self.Action_light3 = self.menu_light.addAction("volume_level")
-
-        self.setContextMenu(self.menu)
-        self.Action_light1.triggered.connect(lambda : self.SignalLIghtMode.emit(LIGHT_MODE.WHITE.value))
-        self.Action_light2.triggered.connect(lambda : self.SignalLIghtMode.emit(LIGHT_MODE.WAVE.value))
-        self.Action_light3.triggered.connect(lambda : self.SignalLIghtMode.emit(LIGHT_MODE.VOLUME_LEVEL.value))
-        self.exitAction.triggered.connect(self.exit)
-        self.Action2.triggered.connect(self.action2)
-        self.settings.triggered.connect(self.actSet)
-        self.activated.connect(self.onTrayIconActivated)
-
-    def onTrayIconActivated(self, reason):
-        if reason == QSystemTrayIcon.Trigger:  # Left click
-            cursor_position = QCursor.pos()
-            # self.menu.show()#(QPoint(cursor_position.x(), cursor_position.y() - 110))
-            # self.menu.popup(QPoint(cursor_position.x(), cursor_position.y() - 110))
-    def actSet(self):
-        self.SignalActSet.emit()
-
-    def setFont(self, font):
-        self.exitAction.setFont(font)
-        self.Action2.setFont(font)
-
-    def exit(self):
-        self.SignalButtonExit.emit()
-
-    def action2(self):
-        if self.flag_warning:
-            self.showMessage("hui", "sosi hui")
-    def masegeIconWarning(self, file_name: str):
-        if self.flag_warning:
-            self.showMessage("ERROR ICON", "icon: '" + file_name + "' don't have size 60x44px")
 
 class MainClass(QWidget):
     volLevelApp = []
@@ -186,15 +130,16 @@ class MainClass(QWidget):
                              -0.15249048173427582,
                              0.0,
                              0.0]
+    valve_light = None
     def __init__(self):
-        super(MainClass, self).__init__()
+        super().__init__()
 
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
         self.trayIcon.flag_warning = MenuSettings.readVarningMode(SETTINGS_TRAY)
-        self.trayIcon.SignalLIghtMode.connect(lambda mode : self.handleSignalLIghtMode(mode))
+        self.trayIcon.SignalLIghtMode.connect(lambda mode: self.handleSignalLIghtMode(mode))
         self.cl_set = {}
-        self.trayIcon.SignalActSet.connect(lambda : MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.styleSheet(), self.setSettings))
+        self.trayIcon.SignalActSet.connect(lambda: MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.styleSheet(), self.setSettings))
         self.trayIcon.SignalButtonExit.connect(self.exitApp)
 
         self.ser = SerCDC(True)
