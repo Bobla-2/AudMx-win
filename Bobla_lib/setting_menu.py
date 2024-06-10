@@ -3,21 +3,36 @@ from PySide6.QtWidgets import QCheckBox, QLabel, QPushButton, QComboBox, QDialog
 from PySide6.QtCore import QSettings
 from PySide6.QtGui import QFont
 from typing import Callable, Dict, Any
+from threading import Lock, Thread
+class Singleton(type):
+  _instances = {}
+  # _lock: Lock = Lock()
+  def __call__(cls, *args, **kwargs):
+      # with cls._lock:
+      if cls not in cls._instances:
+          instance = super().__call__(*args, **kwargs)
+          cls._instances[cls] = instance
+      return cls._instances[cls]
 
-class MenuSettings(QDialog):
+  def _remove_instance(cls):
+      if cls in cls._instances:
+          del cls._instances[cls]
+
+class MenuSettings(metaclass=Singleton):
     __set_tray = ""
     __app_name = ""
 
     def __init__(self, set_tray: str, app_name: str, style: str, func: Callable[[Dict[str, Any]], Any],  parent=None):
-        super().__init__(parent)
+        # super().__init__(parent)
         self.cl = func
         self.__set_tray = set_tray
         self.__app_name = app_name
-        self.setStyleSheet(style)
+        self.dialog = QDialog()
+        self.dialog.setStyleSheet(style)
         font = QFont()
         font.setFamily("Yu Gothic UI Semibold")
         font.setPointSize(int(12))
-        self.setFont(font)
+        self.dialog.setFont(font)
 
         self.__check_box_1 = QCheckBox()
         self.__check_box_1.setFont(font)
@@ -44,14 +59,19 @@ class MenuSettings(QDialog):
         self.__layout.addWidget(self.__set_theme_1, 3, 1, 1, 1)
         self.__layout.addWidget(self.__set_theme_1_lb, 3, 0, 1, 1)
         self.__layout.addWidget(self.__button, 4, 0, 1, 2)
-        self.setLayout(self.__layout)
+        self.dialog.setLayout(self.__layout)
 
         self.__set_theme_1.setCurrentText(QSettings().value(self.__set_tray + "/theme", False, type=str))
         self.__check_box_2.setChecked(QSettings().value(self.__set_tray + "/warning", False, type=int))
         self.__check_box_1.setChecked(AvtoRunStatic.readAppToAvtoRun(self.__app_name))
-        if self.exec_() == QDialog.DialogCode.Accepted:
-            pass
-        self.deleteLater()
+        self.dialog.show()
+        self.dialog.closeEvent = self.on_close       # if self.dialog.exec_() == QDialog.DialogCode.Accepted:
+        #     pass
+        # self.dialog.deleteLater()
+    def on_close(self, event):
+        self.__class__._remove_instance()
+        del self
+
 
     def __safeSettingsApp(self):
         settings = QSettings()

@@ -78,6 +78,9 @@ class SocketVolume():
 
     def stop(self):
         subprocess.Popen("TASKKILL /F /PID {pid} /T".format(pid=self.__process.pid))
+    def __del__(self):
+        SocketVolume.killAllProcess()
+        super().__del__()
 
     @staticmethod
     def killAllProcess():

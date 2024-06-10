@@ -2,8 +2,8 @@ from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume, IAudioEndpointVolume
 import sys
 import win32con
 import win32api
-from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
-from PySide6.QtCore import QTimer, Signal, QCoreApplication, QPoint
+from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtCore import QTimer, QCoreApplication
 from Bobla_lib.serialLib import SerCDC
 from comtypes import CLSCTX_ALL
 from Bobla_lib.icon_manager import IcomReader, VaveLight
@@ -12,7 +12,7 @@ from Bobla_lib.setting_menu import MenuSettings
 from module.theme.windows_thames import AutoUpdateStile
 from PySide6.QtGui import QCursor
 from module.tray.trayApp import SystemTrayIcon
-from module.ENUM.enums import LIGHT_MODE
+from module.ENUM.enums import LIGHT_MODE, dictVolumeDBtoProsent
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
@@ -28,108 +28,8 @@ class MainClass(QWidget):
     teat_perer = 0
     open_process_list = []
     __comand_Buff = ''
-
     __count_presed_button = 0
-    dictVolumeDBtoProsent = [-65.25,
-                             -64.49741,
-                             -58.173828125,
-                             -50.437278747558594,
-                             -47.282318115234375,
-                             -46.02272033691406,
-                             -42.34019088745117,
-                             -40.06081008911133,
-                             -38.07908630371094,
-                             -36.32617950439453,
-                             -34.75468063354492,
-                             -33.33053970336914,
-                             -32.02846908569336,
-                             -30.829191207885742,
-                             -29.7176513671875,
-                             -28.681884765625,
-                             -27.71221923828125,
-                             -26.800716400146484,
-                             -25.940793991088867,
-                             -25.126928329467773,
-                             -24.35443115234375,
-                             -23.61930274963379,
-                             -22.918092727661133,
-                             -22.2478084564209,
-                             -21.605838775634766,
-                             -20.989887237548828,
-                             -20.397926330566406,
-                             -19.828153610229492,
-                             -19.278972625732422,
-                             -18.748943328857422,
-                             -18.236774444580078,
-                             -17.741300582885742,
-                             -17.261470794677734,
-                             -16.796323776245117,
-                             -16.344989776611328,
-                             -15.906672477722168,
-                             -15.480639457702637,
-                             -15.06622314453125,
-                             -14.662806510925293,
-                             -14.269820213317871,
-                             -13.886737823486328,
-                             -13.513073921203613,
-                             -13.148375511169434,
-                             -12.792222023010254,
-                             -12.444223403930664,
-                             -12.10401439666748,
-                             -11.771252632141113,
-                             -11.445619583129883,
-                             -11.12681770324707,
-                             -10.814563751220703,
-                             -10.508596420288086,
-                             -10.20866584777832,
-                             -9.914539337158203,
-                             -9.625996589660645,
-                             -9.342827796936035,
-                             -9.064839363098145,
-                             -8.791844367980957,
-                             -8.523664474487305,
-                             -8.260135650634766,
-                             -8.001096725463867,
-                             -7.746397495269775,
-                             -7.49589729309082,
-                             -7.249458312988281,
-                             -7.006951332092285,
-                             -6.768252372741699,
-                             -6.5332441329956055,
-                             -6.301812648773193,
-                             -6.073853492736816,
-                             -5.849262237548828,
-                             -5.627941608428955,
-                             -5.409796714782715,
-                             -5.194738864898682,
-                             -4.982679843902588,
-                             -4.7735395431518555,
-                             -4.567237854003906,
-                             -4.363698959350586,
-                             -4.162849426269531,
-                             -3.9646193981170654,
-                             -3.7689411640167236,
-                             -3.5757486820220947,
-                             -3.384982109069824,
-                             -3.196580171585083,
-                             -3.0104846954345703,
-                             -2.8266398906707764,
-                             -2.6449923515319824,
-                             -2.4654886722564697,
-                             -2.288081407546997,
-                             -1.7679541110992432,
-                             -1.5984597206115723,
-                             -1.4308334589004517,
-                             -1.2650364637374878,
-                             -1.101028561592102,
-                             -0.9387713074684143,
-                             -0.7782278060913086,
-                             -0.6193622946739197,
-                             -0.4621390104293823,
-                             -0.3065262734889984,
-                             -0.15249048173427582,
-                             0.0,
-                             0.0]
+
     valve_light = None
     def __init__(self):
         super().__init__()
@@ -156,6 +56,10 @@ class MainClass(QWidget):
         self.timer_setIconNum = QTimer()
         self.timer_setIconNum.timeout.connect(self.setIconNum)
         self.timer_setIconNum.setInterval(250)
+        self.timer_is_work = QTimer()
+        self.timer_is_work.timeout.connect(lambda: self.ser.writeSerial('ISWORK\n'))
+        self.timer_is_work.setInterval(25000)
+        self.timer_is_work.start()
 
         pid = 4097
         vid = 12346
@@ -261,16 +165,16 @@ class MainClass(QWidget):
             return
         self.audioSessions = AudioUtilities.GetAllSessions()
         for i in range(5):
-            self.icon_mass[i].volume_level = int(int(comand[i])/10.24)
             if self.icon_mass[i].name == "":
                 return
+            self.icon_mass[i].volume_level = int(int(comand[i])/10.24)
             if self.icon_mass[i].last_volume_level != self.icon_mass[i].volume_level:
                 self.icon_mass[i].last_volume_level = self.icon_mass[i].volume_level
                 if self.icon_mass[i].name == "master.exe":
                     devices = AudioUtilities.GetSpeakers()
                     interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
                     volume = interface.QueryInterface(IAudioEndpointVolume)
-                    volume.SetMasterVolumeLevel(self.dictVolumeDBtoProsent[self.icon_mass[i].volume_level], None)
+                    volume.SetMasterVolumeLevel(dictVolumeDBtoProsent[self.icon_mass[i].volume_level], None)
                     continue
                 for session in self.audioSessions:
                     if session.Process and session.Process.name() == self.icon_mass[i].name:

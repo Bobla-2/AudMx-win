@@ -7,13 +7,6 @@ class seriall(QObject):
     SignalSerialRegOk = Signal()
     SignalSerialStartOk = Signal()
     SignalError = Signal(str)
-    # SignalInvalidComand = Signal()
-    # SignalReadFinish = Signal(list)
-    # SignalReadLine = Signal(str)
-    # SignalReadButton = Signal(str)
-    # SignalReadVoluem = Signal(str)
-    # SignalSetIcon = Signal(int)
-    # SignalGetIcon = Signal()
     __productIdentifier = 0
     __vendorIdentifier = 0
     __BaudRate = 0
@@ -53,7 +46,7 @@ class seriall(QObject):
             self.SignalError.emit('disconnected')
             print("Serial port disconnected!")
             self.closeSerial()
-            __ser_work = False
+            self.__ser_work = False
             if (self.__flag_reconnect == True):
                 self.__timer_avto_connect.start()
 
@@ -159,7 +152,7 @@ class SerCDC(seriall):
         self.__flag_cdc = mod
     @property
     def __isSerWork(self):
-        if self.__ser_work == False:
+        if self.doesSerWork == False:
             self.__timer_cdc.stop()
             self.__quwewe_write.clear()
             return False

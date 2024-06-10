@@ -155,12 +155,7 @@ class VaveLight():
     @property
     def volume(self):
         return [float(it[1]) for it in self.__mas_vol_socket]
-    # def avtoUpdate(self, serWrite):
-    #     self.__serW = serWrite
-    #     self.timer = QTimer()
-    #     self.timer.timeout.connect(self.__sendCom)
-    #     self.timer.setInterval(33)
-    #     self.timer.start()
+
     def __sendCom(self):
 
         com = ""

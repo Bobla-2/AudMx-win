@@ -1,7 +1,6 @@
-from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon, QWidget
-from PySide6.QtCore import QTimer, Signal, QCoreApplication, QPoint
+from PySide6.QtWidgets import QMenu, QSystemTrayIcon
+from PySide6.QtCore import Signal
 from ..ENUM.enums import LIGHT_MODE
-
 
 class SystemTrayIcon(QSystemTrayIcon):           #класс приложения в трее
     flag_warning = True
@@ -33,7 +32,8 @@ class SystemTrayIcon(QSystemTrayIcon):           #класс приложени�
 
     def onTrayIconActivated(self, reason):
         if reason == QSystemTrayIcon.Trigger:  # Left click
-            cursor_position = QCursor.pos()
+            pass
+            # cursor_position = QCursor.pos()
             # self.menu.show()#(QPoint(cursor_position.x(), cursor_position.y() - 110))
             # self.menu.popup(QPoint(cursor_position.x(), cursor_position.y() - 110))
     def actSet(self):
