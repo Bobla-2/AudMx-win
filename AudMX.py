@@ -166,6 +166,7 @@ class MainClass(QWidget):
         self.audioSessions = AudioUtilities.GetAllSessions()
         for i in range(5):
             if self.icon_mass[i].name == "":
+                
                 return
             self.icon_mass[i].volume_level = int(int(comand[i])/10.24)
             if self.icon_mass[i].last_volume_level != self.icon_mass[i].volume_level:

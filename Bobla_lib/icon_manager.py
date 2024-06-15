@@ -44,7 +44,12 @@ class IconCl(object):
         """
         img = Image.open(image_path)
         if img.mode != '1':
-            raise ValueError("Изображение не является монохромным")
+            print(image_path)
+            self.__path = ""
+            self.__name = ""
+            return bytes([0]) * 352
+
+            # raise ValueError("Изображение не является монохромным")
         img_bytes = img.tobytes()
         return img_bytes
     @property
@@ -98,6 +103,7 @@ class IcomReader():
         __icon_mass = IcomReader.__processFolder(path, open_poccess_list, irq_massege)
         while (len(__icon_mass) < len_):
             __icon_mass.append(IconCl(None, len(__icon_mass)))
+
         return __icon_mass
     @staticmethod
     def __processFolder(folder_path: str, poccess_list: list, irq_massege) -> list[bytes]:
