@@ -3,11 +3,12 @@ import sys
 import win32con
 import win32api
 from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtGui import QIcon
 from PySide6.QtCore import QTimer, QCoreApplication
 from Bobla_lib.serialLib import SerCDC
 from comtypes import CLSCTX_ALL
 from Bobla_lib.icon_manager import IcomReader, VaveLight
-
+# from module.resurce import resources
 from Bobla_lib.setting_menu import MenuSettings
 from module.theme.windows_thames import AutoUpdateStile
 from PySide6.QtGui import QCursor
@@ -67,8 +68,9 @@ class MainClass(QWidget):
         self.ser.autoConnect(vid, pid, 1000000, True)
         self.avto_udate_theme = AutoUpdateStile()
         self.avto_udate_theme.theme = MenuSettings.readThemeMode(SETTINGS_TRAY)
-        self.avto_udate_theme.appendedCallback(self.setStyleSheet, "W_sylete", "B_sylete", "CSS")
-        self.avto_udate_theme.appendedCallback(self.trayIcon.setIcon, "iconTrayW.png", "iconTrayB.png", "ICON")
+        # self.trayIcon.setIcon(QIcon(":/icons/iconTrayB.png"))
+        self.avto_udate_theme.appendedCallback(self.setStyleSheet, ":/qss/W_sylete", ":/qss/B_sylete", "CSS")
+        self.avto_udate_theme.appendedCallback(self.trayIcon.setIcon, ":/icons/iconTrayW.png", ":/icons/iconTrayB.png", "ICON")
         self.flag_setIconNum = 0
     def setSettings(self, set: dict):
         if 'warning' in set:

@@ -1,0 +1,11 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="icons">
+        <file alias="iconTrayB.png">./trayIcon/iconTrayB.png</file>
+        <file alias="iconTrayW.png">./trayIcon/iconTrayW.png</file>
+    </qresource>
+	<qresource prefix="qss">
+        <file alias="B_sylete">./qss/B_sylete</file>
+        <file alias="W_sylete">./qss/W_sylete</file>
+    </qresource>
+</RCC>
