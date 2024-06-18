@@ -71,6 +71,7 @@ class MainClass(QWidget):
         # self.trayIcon.setIcon(QIcon(":/icons/iconTrayB.png"))
         self.avto_udate_theme.appendedCallback(self.setStyleSheet, ":/qss/W_sylete", ":/qss/B_sylete", "CSS")
         self.avto_udate_theme.appendedCallback(self.trayIcon.setIcon, ":/icons/iconTrayW.png", ":/icons/iconTrayB.png", "ICON")
+        # timp = Monitor().setAutoSkale(self.window, [(self.frame_left, 100, 100), (self.button_round_test, 80, 60)])
         self.flag_setIconNum = 0
     def setSettings(self, set: dict):
         if 'warning' in set:

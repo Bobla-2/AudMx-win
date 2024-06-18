@@ -4,6 +4,7 @@ import os
 from PySide6.QtCore import QTimer, QFile, QIODevice, QTextStream
 from PySide6.QtGui import QIcon
 from module.resurce import resources
+from Bobla_lib.single_ton_meta import Singleton
 reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
 
@@ -60,7 +61,7 @@ class ThemesWindows():
             return QIcon(path_to_W)
         return None
 
-class AutoUpdateStile():
+class AutoUpdateStile(metaclass=Singleton):
     __callback = []
     __old_theme = 0
     __set_fix_theme = "system"
