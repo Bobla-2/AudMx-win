@@ -138,12 +138,16 @@ class SerCDC(seriall):
     __last_write = None
     __count_packeg = 0
     __num_packeg = 0
-    def __init__(self, On_CDC: bool):
+    def __init__(self, On_CDC: bool,watch_dog = False ):
         super().__init__()
         self.__flag_cdc = On_CDC
         self.__timer_cdc = QTimer()
         self.__timer_cdc.timeout.connect(self.__load64Byte)
         self.__timer_cdc.setInterval(10)
+        if watch_dog:
+            self.watch_dog = QTimer()
+            self.watch_dog.timeout.connect(self.watchDog)
+            self.watch_dog.setInterval(10000)
     @property
     def mod_CDC(self):
         return self.__flag_cdc

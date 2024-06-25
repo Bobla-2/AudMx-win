@@ -4,7 +4,6 @@ import os
 from PySide6.QtCore import QTimer, QFile, QIODevice, QTextStream
 from PySide6.QtGui import QIcon
 from module.resurce import resources
-from Bobla_lib.single_ton_meta import Singleton
 reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
 
@@ -25,45 +24,33 @@ class ThemesWindows():
 
                     return value
             except:
-                print('тема:' + str(value))
+                pass
     @staticmethod
     def getCSSFile(theme: int, path_to_W: str, path_to_B: str) -> str:
 
         if theme == 0:
-            # bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-            # path = os.path.join(bundle_dir, path_to_B)
-
-            # with open(path_to_B, "r+") as style_file:
-            #     cssStyle = str(style_file.read())
-            #     return cssStyle
             stream = QFile(path_to_B)
             stream.open(QIODevice.ReadOnly)
-            return QTextStream(stream).readAll()
+            t = QTextStream(stream).readAll()
+            return t
         else:
-            # bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-            # path = os.path.join(bundle_dir, path_to_W)
             stream = QFile(path_to_W)
             stream.open(QIODevice.ReadOnly)
-            return QTextStream(stream).readAll()
-            # with open(path_to_W, "r+") as style_file:
-            #     return str(style_file.read())
+            t = QTextStream(stream).readAll()
+            return t
         return ""
 
     @staticmethod
     def getIconFile(theme: int, path_to_W: str, path_to_B: str) -> str:
         if theme == 0:
-            # bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-            # path = os.path.join(bundle_dir, path_to_B)
             return QIcon(path_to_B)
         else:
-            # bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
-            # path = os.path.join(bundle_dir, path_to_W)
             return QIcon(path_to_W)
         return None
 
-class AutoUpdateStile(metaclass=Singleton):
+class AutoUpdateStile():
     __callback = []
-    __old_theme = 0
+    __old_theme = -1
     __set_fix_theme = "system"
     def __init__(self, interval=3000):
         '''
@@ -72,7 +59,7 @@ class AutoUpdateStile(metaclass=Singleton):
         '''
         self.__timer = QTimer()
         self.__timer.timeout.connect(self.__upDateStyle)
-        self.__timer.setInterval(3000)
+        self.__timer.setInterval(6000)
         self.__old_theme = ThemesWindows.getStyle()
         self.__timer.start()
 
@@ -80,12 +67,13 @@ class AutoUpdateStile(metaclass=Singleton):
         self.__callback.append((callback, path_to_W, path_to_B, type))
         self.__setStyle(self.__old_theme)
 
+
     def __setStyle(self, old_theme):
         for cb in self.__callback:
             if cb[3] == "CSS":
-                cb[0](ThemesWindows.getCSSFile(old_theme, cb[1], cb[2]))
+                h = ThemesWindows.getCSSFile(old_theme, cb[1], cb[2])
+                cb[0](h)
             elif cb[3] == "ICON":
-                # cb[0](QIcon(":/icons/iconTrayB.png"))
                 cb[0](ThemesWindows.getIconFile(old_theme, cb[1], cb[2]))
 
     def __upDateStyle(self):

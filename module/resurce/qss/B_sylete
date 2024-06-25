@@ -528,43 +528,36 @@ QToolButton#qt_toolbar_ext_button {
     background: #58595a
 }
 
+
 QPushButton
 {
-    color: #eff0f1;
-    background-color: #323232;
-    border-width: 1px;
-    border-color: #76797C;
-    border-style: solid;
-    padding: 5px;
-    border-radius: 0px;
+    background: rgba(255, 255, 255, 0.0605);
+    border: 1px solid rgba(255, 255, 255, 0.053);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    color: white;
+    /* font: 14px 'Segoe UI', 'Microsoft YaHei', 'PingFang SC'; */
+    padding: 5px 12px 6px 12px;
     outline: none;
 }
 
 QPushButton:disabled
 {
-    background-color: #323232;
-    border-width: 1px;
-    border-color: #454545;
-    border-style: solid;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 2px;
-    color: #454545;
+    color: rgba(255, 255, 255, 0.3628);
+    background: rgba(255, 255, 255, 0.0419);
+    border: 1px solid rgba(255, 255, 255, 0.053);
+    border-top: 1px solid rgba(255, 255, 255, 0.053);
 }
 
 QPushButton:focus {
-    background-color: #D1DBCB;
-    color: black;
+    
 }
 
 QPushButton:pressed
 {
-    color: black;
-    background-color: #D1DBCB;
-    padding-top: -15px;
-    padding-bottom: -17px;
+    color: rgba(255, 255, 255, 0.786);
+    background: rgba(255, 255, 255, 0.0326);
+    border-top: 1px solid rgba(255, 255, 255, 0.053); 
 }
 
 QComboBox

@@ -1,29 +1,49 @@
 QPushButton {
-    background-color: #DDDDDD;
-    color: #333333;
-    border-radius: 4px;
-    padding: 8px 16px;
-    border: 1px solid rgb(160,160,160);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    color: black;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.073);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.183);
+    border-radius: 5px;
+    /* font: 14px 'Segoe UI', 'Microsoft YaHei'; */
+    padding: 5px 12px 6px 12px;
+    outline: none;
+}
+QPushButton:pressed{
+    color: rgba(0, 0, 0, 0.63);
+    background: rgba(235, 235, 235, 0.5);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.073);
 }
 
-QComboBox{
-    selection-background-color: #DDDDDD;
-    background-color: #31363B;
-    border-style: solid;
-    border: 1px solid #76797C;
-    border-radius: 2px;
-    padding: 5px;
-    min-width: 75px;
+QPushButton:disabled{
+    color: rgba(0, 0, 0, 0.36);
+    background: rgba(249, 249, 249, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 QPushButton:checked{
     background-color: #76797C;
     border-color: #6A6969;
 }
 
+QComboBox{
+    selection-background-color: #DDDDDD;
+    background-color: #31363B;
+    border-style: solid;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 5px;
+    min-width: 75px;
+	
+}
+QComboBox:disabled{
+	color: rgba(0, 0, 0, 0.36);
+    background: rgba(249, 249, 249, 0.3);
+}
+
+
 QComboBox:hover,QPushButton:hover,QAbstractSpinBox:hover,QLineEdit:hover,QTextEdit:hover,QPlainTextEdit:hover,QAbstractView:hover,QTreeView:hover
 {
-    border: 1px solid #D1DBCB;
+    background: rgba(249, 249, 249, 0.5);
 }
 
 QComboBox:on{
@@ -33,11 +53,15 @@ QComboBox:on{
 }
 
 QComboBox QAbstractItemView{
-    background-color: #DDDDDD;
-    border-radius: 2px;
-    border: 1px solid #76797C;
-    selection-background-color: #D1DBCB;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    border: 0px solid #dddddd;
+    selection-background-color: #dddddd;
+	selection-color: #111111;
+	selection-border: 0px solid #dddddd;
+	
 }
+
 
 QComboBox::drop-down{
     subcontrol-origin: padding;
@@ -58,10 +82,18 @@ QComboBox::down-arrow{
 QMainWindow {
     border-left: 0px solid #555555;
     border-radius: 0px;
+	background-color: #eeeeee;
 }
 QFrame {
-    border: 1px solid #111111;
-    border-radius: 4px;
+    background-color: #eeeeee;
+    border-radius: 6px;
+	border: 0px solid
+
+}
+QFrame#grei {
+    background-color: #dddddd;
+    border-radius: 6px;
+	border: 0px solid
 
 }
 QWidget {
@@ -77,14 +109,24 @@ QLineEdit{
     border-radius: 2px;
     color: #333333;
 }
-QLabel {
-    color: #333333;
+QLineEdit{
+    background-color: #FFFFFF;
+    selection-background-color: #D1DBCB;
+    selection-color: black;
+
+    border-style: solid;
+    border: 0px solid #76797C;
+    border-radius: 2px;
+    color: #000000;
+}
+QLabel#grei{
+    color: #000000;
     text-align: center;
 
-    border: 1px solid #111111;
-    border-radius: 2px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    background-color: #FFFFFF;
+    border: 2px solid #dddddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    background-color: #dddddd;
 }
 QScrollBar:horizontal
 {
@@ -218,4 +260,27 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 {
     background: none;
+}
+MinimizeButton {
+    qproperty-normalColor: black;
+    qproperty-normalBackgroundColor: transparent;
+    qproperty-hoverColor: black;
+    qproperty-hoverBackgroundColor: rgba(0, 0, 0, 26);
+    qproperty-pressedColor: black;
+    qproperty-pressedBackgroundColor: rgba(0, 0, 0, 51)
+}
+
+
+MaximizeButton {
+    qproperty-normalColor: black;
+    qproperty-normalBackgroundColor: transparent;
+    qproperty-hoverColor: black;
+    qproperty-hoverBackgroundColor: rgba(0, 0, 0, 26);
+    qproperty-pressedColor: black;
+    qproperty-pressedBackgroundColor: rgba(0, 0, 0, 51)
+}
+
+CloseButton {
+    qproperty-normalColor: black;
+    qproperty-normalBackgroundColor: transparent;
 }
