@@ -8,35 +8,49 @@ from PySide6.QtCore import QTimer, Signal, QObject
 from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
 
 
-
+glob_queue = queue.Queue()
 
 class MyBlue:
+    tmp = ''
     def __init__(self):
-        self.my_queue = queue.Queue()
+        global glob_queue
+        self.my_queue = glob_queue
         self.timer = QTimer()
         self.timer.timeout.connect(self.check_queue)
-        self.timer.setInterval(1500)
-        self.timer.start()
+        self.timer.setInterval(500)
 
+
+
+    def connect(self, NAME, uuid):
+        print("connect")
         self.__loop = asyncio.new_event_loop()
+        self.timer.start()
         self.__t = threading.Thread(target=self.run_in_thread, args=(self.__loop, self.my_queue,))
         self.__t.daemon = True
-        print(self.my_queue.get())
+        # print(self.my_queue.get())
         self.__t.start()
 
+
     def check_queue(self):
+
         try:
-            # Проверяем очередь на наличие нового элемента
             print(self.my_queue.get_nowait())
+            self.check_queue()
 
         except queue.Empty:
-            print("asd")
+            # print("asd")
             pass
-
+    def write(self, str):
+        print(str)
+        pass
 
     async def notification_handler(self, sender, data):
-            data_str = data.decode("utf-8")  # Convert bytearray to string
-            print(f"Notification from {sender}: {data_str}")
+        data_str = data.decode("utf-8")  # Convert bytearray to string
+        global glob_queue
+        # qwerweq = data_str
+        # print(f"----------------{data_str}")
+        # self.write(str(data_str))
+        glob_queue.put(data_str)
 
     async def find_device_address(self, device_name, queue):
         try:
@@ -49,7 +63,7 @@ class MyBlue:
                 return device.address
         return None
 
-    async def send_blob_chunk(self,client, characteristic_uuid, chunk):
+    async def send_blob_chunk(self, client, characteristic_uuid, chunk):
         try:
             await client.write_gatt_char(characteristic_uuid, chunk, response=True)
             print(f"Chunk sent: {chunk}")

@@ -11,10 +11,10 @@ from Bobla_lib.icon_manager import IcomReader, VaveLight
 # from module.resurce import resources
 from Bobla_lib.setting_menu import MenuSettings
 from module.theme.windows_thames import AutoUpdateStile
-from PySide6.QtGui import QCursor
+# from PySide6.QtGui import QCursor
 from module.tray.trayApp import SystemTrayIcon
 from module.ENUM.enums import LIGHT_MODE, dictVolumeDBtoProsent
-from Bobla_lib.test_py_func import MyBlue
+from Bobla_lib.serial_blu import ConectAudMX
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
@@ -35,8 +35,8 @@ class MainClass(QWidget):
     valve_light = None
     def __init__(self):
         super().__init__()
-        self.c = MyBlue()
-
+        # self.c = MyBlue()
+        # print("sdf")
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
         self.trayIcon.flag_warning = MenuSettings.readVarningMode(SETTINGS_TRAY)
@@ -45,7 +45,7 @@ class MainClass(QWidget):
         self.trayIcon.SignalActSet.connect(lambda: MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.styleSheet(), self.setSettings))
         self.trayIcon.SignalButtonExit.connect(self.exitApp)
 
-        self.ser = SerCDC(True)
+        self.ser = ConectAudMX(True)
         self.ser.setHanglerRead(self.hanglerReadSer)
         # self.audioSessions = AudioUtilities.GetAllSessions()
 
@@ -61,7 +61,7 @@ class MainClass(QWidget):
         self.timer_setIconNum.setInterval(250)
         self.timer_is_work = QTimer()
         self.timer_is_work.timeout.connect(lambda: self.ser.writeSerial('ISWORK\n'))
-        self.timer_is_work.setInterval(25000)
+        self.timer_is_work.setInterval(20000)
         self.timer_is_work.start()
 
         pid = 4097
@@ -75,12 +75,12 @@ class MainClass(QWidget):
         self.avto_udate_theme.appendedCallback(self.trayIcon.setIcon, ":/icons/iconTrayW.png", ":/icons/iconTrayB.png", "ICON")
         # timp = Monitor().setAutoSkale(self.window, [(self.frame_left, 100, 100), (self.button_round_test, 80, 60)])
         self.flag_setIconNum = 0
+
     def setSettings(self, set: dict):
         if 'warning' in set:
             self.trayIcon.flag_warning = set["warning"]
         if 'theme' in set:
             self.avto_udate_theme.theme = set["theme"]
-
 
     def hanglerReadSer(self, iner: str):
         if iner.find("BUTTON:") != -1:
@@ -171,7 +171,6 @@ class MainClass(QWidget):
         self.audioSessions = AudioUtilities.GetAllSessions()
         for i in range(5):
             if self.icon_mass[i].name == "":
-                
                 return
             self.icon_mass[i].volume_level = int(int(comand[i])/10.24)
             if self.icon_mass[i].last_volume_level != self.icon_mass[i].volume_level:
