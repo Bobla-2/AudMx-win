@@ -14,6 +14,7 @@ from module.theme.windows_thames import AutoUpdateStile
 from PySide6.QtGui import QCursor
 from module.tray.trayApp import SystemTrayIcon
 from module.ENUM.enums import LIGHT_MODE, dictVolumeDBtoProsent
+from Bobla_lib.test_py_func import MyBlue
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
@@ -34,6 +35,7 @@ class MainClass(QWidget):
     valve_light = None
     def __init__(self):
         super().__init__()
+        self.c = MyBlue()
 
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
@@ -249,7 +251,18 @@ class MainClass(QWidget):
             self.valve_light.stop()
         QCoreApplication.exit()
 
+
+
+
+from Bobla_lib import test_py_func
+
+# def run_in_thread(loop):
+#     asyncio.set_event_loop(loop)
+#     loop.run_until_complete(main())
+#     print("run_in_thread")
+
 if __name__ == '__main__':
+    # loop = asyncio.new_event_loop()
     QCoreApplication.setOrganizationName(ORGANIZATION_NAME)
     QCoreApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
     QCoreApplication.setApplicationName(APPLICATION_NAME)
@@ -257,3 +270,4 @@ if __name__ == '__main__':
     app.setQuitOnLastWindowClosed(False)
     window = MainClass()
     sys.exit(app.exec())
+
