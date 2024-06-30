@@ -46,6 +46,12 @@ QComboBox:hover,QPushButton:hover,QAbstractSpinBox:hover,QLineEdit:hover,QTextEd
     background: rgba(249, 249, 249, 0.5);
 }
 
+QMenu:hover{
+	background: rgba(249, 249, 249, 0.5);
+	color: rgba(49, 49, 49, 0.5);
+}
+
+
 QComboBox:on{
     padding-top: 0px;
     padding-left: 4px;

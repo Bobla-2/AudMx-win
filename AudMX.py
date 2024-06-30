@@ -3,7 +3,7 @@ import sys
 import win32con
 import win32api
 from PySide6.QtWidgets import QApplication, QWidget
-from PySide6.QtGui import QIcon
+# from PySide6.QtGui import QIcon
 from PySide6.QtCore import QTimer, QCoreApplication
 from Bobla_lib.serialLib import SerCDC
 from comtypes import CLSCTX_ALL
@@ -41,28 +41,30 @@ class MainClass(QWidget):
         self.trayIcon.show()
         self.trayIcon.flag_warning = MenuSettings.readVarningMode(SETTINGS_TRAY)
         self.trayIcon.SignalLIghtMode.connect(lambda mode: self.handleSignalLIghtMode(mode))
+
         self.cl_set = {}
         self.trayIcon.SignalActSet.connect(lambda: MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.styleSheet(), self.setSettings))
         self.trayIcon.SignalButtonExit.connect(self.exitApp)
 
-        self.ser = ConectAudMX(True)
-        self.ser.setHanglerRead(self.hanglerReadSer)
         # self.audioSessions = AudioUtilities.GetAllSessions()
 
         self.timer_2 = QTimer()
         self.timer_2.timeout.connect(self.update_)
         self.timer_2.setInterval(5000)
         self.timer_2.start()
-        self.update_()
-        self.upDateListOpenProcces()
         self.icon_mass = []
         self.timer_setIconNum = QTimer()
         self.timer_setIconNum.timeout.connect(self.setIconNum)
         self.timer_setIconNum.setInterval(250)
+        self.ser = ConectAudMX(True)
+        self.update_(True)
+        self.upDateListOpenProcces()
         self.timer_is_work = QTimer()
         self.timer_is_work.timeout.connect(lambda: self.ser.writeSerial('ISWORK\n'))
         self.timer_is_work.setInterval(20000)
         self.timer_is_work.start()
+        self.ser.setHanglerRead(self.hanglerReadSer)
+        self.trayIcon.SignalChangeBluSer.connect(self.ser.changMod)
 
         pid = 4097
         vid = 12346
@@ -92,12 +94,12 @@ class MainClass(QWidget):
         elif iner.find("OK") != -1:
             if self.num_load_icon != -1:
                 if self.flag_setIconNum == 1:
-                    print("self.loadIconOnESP(1)--hanglerReadSer")
+                    # print("self.loadIconOnESP(1)--hanglerReadSer")
                     self.loadIconOnESP(1)
         elif iner.find("ERROR: -1") != -1:
             if self.flag_setIconNum == 1:
                 if self.num_load_icon != -1:
-                    print("self.loadIconOnESP(0)--hanglerReadSer")
+                    # print("self.loadIconOnESP(0)--hanglerReadSer")
                     self.loadIconOnESP(0)
         elif iner.find("Send 352 bytes") != -1:
             self.handleGetIcon()
@@ -106,12 +108,12 @@ class MainClass(QWidget):
         # a = AudioUtilities.GetAllSessions()
         self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
 
-    def update_(self):
+    def update_(self, tp=False):
         """
         #функция вызываеммая таймером и обновляющяя стиль приложения
         :return: None
         """
-        if (self.ser.doesSerWork == 1):
+        if (self.ser.doesSerWork == 1 or tp):
             self.upDateListOpenProcces()
             if (self.last_process_list != self.open_process_list):
                 IcomReader.setLastLevel(self.icon_mass, 0)
@@ -124,8 +126,9 @@ class MainClass(QWidget):
                     self.ser.clearnSend()
                     if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
                         self.valve_light.updateList(self.icon_mass)
-                    print("self.loadIconOnESP(1)--update_")
-                    self.loadIconOnESP(1)
+                    if (self.ser.doesSerWork == 1):
+                        print("self.loadIconOnESP(1)--update_")
+                        self.loadIconOnESP(1)
 
     def keyPleerHandle(self, comand: str) -> None:
         """
@@ -212,7 +215,8 @@ class MainClass(QWidget):
         :return:
         """
         self.last_process_list = []
-        self.icon_mass.clear()
+        # self.icon_mass.clear()
+        # self.update_(True)
         self.num_load_icon = -1
 
     def loadIconOnESP(self, ans=0):

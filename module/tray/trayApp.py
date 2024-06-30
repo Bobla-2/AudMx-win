@@ -6,6 +6,7 @@ class SystemTrayIcon(QSystemTrayIcon):           #класс приложени�
     flag_warning = True
     SignalLIghtMode = Signal(int)
     SignalActSet = Signal()
+    SignalChangeBluSer = Signal()
     SignalButtonExit = Signal()
     def __init__(self, parent=None):
         QSystemTrayIcon.__init__(self, parent)
@@ -14,7 +15,7 @@ class SystemTrayIcon(QSystemTrayIcon):           #класс приложени�
 
         self.menu_light = self.menu.addMenu("light")
         self.settings = self.menu.addAction("setting")
-        self.Action2 = self.menu.addAction("Action2")
+        self.Action2 = self.menu.addAction("set BLU")
         self.exitAction = self.menu.addAction("EXIT")
 
         self.Action_light1 = self.menu_light.addAction("white")
@@ -47,8 +48,12 @@ class SystemTrayIcon(QSystemTrayIcon):           #класс приложени�
         self.SignalButtonExit.emit()
 
     def action2(self):
-        if self.flag_warning:
-            self.showMessage("hui", "sosi hui")
+        if self.Action2.text() == "set BLU":
+            self.Action2.setText("set USB")
+        else:
+            self.Action2.setText("set BLU")
+        self.SignalChangeBluSer.emit()
+
     def masegeIconWarning(self, file_name: str):
         if self.flag_warning:
             self.showMessage("ERROR ICON", "icon: '" + file_name + "' don't have size 60x44px")

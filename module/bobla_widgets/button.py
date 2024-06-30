@@ -6,12 +6,12 @@ class CheckButton():
         super().__init__()
         self.__btn = QPushButton(text, parent)
         self.__btn.clicked.connect(self.__click)
-        self.__btn.setStyleSheet("background-color: #f3f3f3")
+        self.__btn.setStyleSheet("background-color: #999999")
     def __setColor(self):
         if self.__is_pressed == 1:
             self.__btn.setStyleSheet("background-color: #bbbbff")
         else:
-            self.__btn.setStyleSheet("background-color: #f3f3f3")
+            self.__btn.setStyleSheet("background-color: #999999")
     def __click(self):
         self.__is_pressed = not self.__is_pressed
         self.__setColor()

@@ -6,57 +6,114 @@ from bleak import BleakClient, BleakScanner
 import queue
 from PySide6.QtCore import QTimer, Signal, QObject
 from PySide6.QtWidgets import QApplication, QLabel, QVBoxLayout, QWidget
+from Bobla_lib.single_ton_meta import Singleton
+import  sys
 
 
 glob_queue = queue.Queue()
+glob_queue_tx = queue.Queue()
 
-class MyBlue:
+class MyBlue(QObject):
+    SignalSerialStartOk = Signal()
+    __blu_work = False
+    __handleRead = None
+    buff_send = ""
     tmp = ''
-    def __init__(self):
+    def __init__(self, skjd):
+        self.skjd = skjd
         global glob_queue
         self.my_queue = glob_queue
         self.timer = QTimer()
         self.timer.timeout.connect(self.check_queue)
-        self.timer.setInterval(500)
+        self.timer.setInterval(150)
+    def write(self, str):
+        if str[:9] == "SET_ICON ":
+            self.buff_send = "00002ff" + chr(ord(str[10]) + 2) + "-0000-1000-8000-00805f9b34fb"
+            self.my_queue.put("Send 352 bytes")
+            return
+        if len(self.buff_send) != 0:
+            global glob_queue_tx
+            glob_queue_tx.put([self.buff_send, str])
+            self.buff_send = ""
+    def setHanglerRead(self, hang: object):
+        self.__handleRead = hang
+    @property
+    def doesBluWork(self):
+        return self.__blu_work
+    def autoConnect(self, NAME):
+        self.connect(NAME)
+        self.timer_con = QTimer()
+        self.timer_con.timeout.connect(self.__reconnect)
+        self.timer_con.setInterval(3500)
+        self.timer_con.start()
+    def close(self):
+        global glob_queue_tx
+        glob_queue_tx.put(["close"])
+        self.timer_con.stop()
+        self.__blu_work = False
+
+    def __reconnect(self):
+        if self.doesBluWork == True:
+            self.timer_con.stop()
+            self.timer.start()
+            self.skjd()
+            # self.SignalSerialStartOk.emit()
+        else:
+            self.__blu_work = False
+            global glob_queue
+            try:
+                tmp = glob_queue.get_nowait()
+                if tmp == "connect":
+                    self.__blu_work = True
+                    self.__reconnect()
+                print("reconnect:  " + tmp)
+                if tmp == "error: main":
+                    self.connect("")
+                elif tmp == "bluet. off":
+                    self.connect("")
+                else:
+                    global glob_queue_tx
+                    glob_queue_tx.put(["reconnect"])
+                self.__reconnect()
+            except queue.Empty:
+                pass
 
 
-
-    def connect(self, NAME, uuid):
+    def connect(self, NAME):
         print("connect")
         self.__loop = asyncio.new_event_loop()
-        self.timer.start()
+
         self.__t = threading.Thread(target=self.run_in_thread, args=(self.__loop, self.my_queue,))
         self.__t.daemon = True
-        # print(self.my_queue.get())
         self.__t.start()
-
+        # self.__blu_work = True
 
     def check_queue(self):
-
         try:
-            print(self.my_queue.get_nowait())
-            self.check_queue()
+            tmp = self.my_queue.get_nowait()
+            # if tmp == "connect":
 
+            if self.__handleRead != None:
+                self.__handleRead(tmp)
+                self.check_queue()
         except queue.Empty:
-            # print("asd")
             pass
     def write(self, str):
         print(str)
         pass
 
     async def notification_handler(self, sender, data):
-        data_str = data.decode("utf-8")  # Convert bytearray to string
+        data_str = data.decode("utf-8")
         global glob_queue
-        # qwerweq = data_str
-        # print(f"----------------{data_str}")
-        # self.write(str(data_str))
         glob_queue.put(data_str)
 
     async def find_device_address(self, device_name, queue):
         try:
             devices = await BleakScanner.discover()
         except:
-            print("bluet. off")
+            queue.put("bluet. off")
+            sys.exit()
+            # print("bluet. off")
             return None
         for device in devices:
             if device_name == device.name:
@@ -76,29 +133,40 @@ class MyBlue:
             chunk = blob[i:i + chunk_size]
             await self.send_blob_chunk(client, characteristic_uuid, chunk)
 
-    async def send_img(self, client, characteristic_uuid):
+    async def send_img(self, client, characteristic_uuid, img):
         # Отправка мусора что бы сбросить входной буффер
         chunk = "!"
         await client.write_gatt_char("00002ff1-0000-1000-8000-00805f9b34fb", chunk.encode("UTF-8"), response=True)
 
-        characters = string.ascii_letters + string.digits + string.punctuation
-        # Рандомная хуйня что бы заплнить экран
-        random_string = ''.join(random.choice(characters) for _ in range(352))
-
-        await self.send_blob(client, characteristic_uuid, random_string.encode("UTF-8"))
+        await self.send_blob(client, characteristic_uuid, img.encode("UTF-8"))
 
     async def connect_and_subscribe(self, device_address, characteristic_uuid):
+        global glob_queue_tx
+        global glob_queue
         try:
             async with BleakClient(device_address) as client:
                 if client.is_connected:
-
                     # Уведомления для громкости
                     await client.start_notify(characteristic_uuid, self.notification_handler)
                     # У каждого дисплея уникальный адрес, 00002ff3 - он закодирован в последней цифре, 3 - это второй диспей, 2 - первый и тд
-                    await self.send_img(client, "00002ff3-0000-1000-8000-00805f9b34fb")
-                    # Тупо нихуя больше не делам
+
+                    # await self.send_img(client, "00002ff3-0000-1000-8000-00805f9b34fb")
+                    glob_queue.put("connect")
                     while True:
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(200)
+                        try:
+                            tmp = glob_queue_tx.get_nowait()
+                            if len(tmp) != 0:
+                                if tmp[0] == "reconnect":
+                                    pass
+                                elif tmp[0][0] == "0":
+                                    pass
+                                    # self.send_img(client, tmp[0], tmp[1])
+                                elif tmp[0] == "close":
+                                    sys.exit()
+
+                        except queue.Empty:
+                            pass
         except Exception as e:
             print(f"Exception: {e}")
 
@@ -109,7 +177,8 @@ class MyBlue:
         if device_address:
             await self.connect_and_subscribe(device_address, CHARACTERISTIC_UUID)
         else:
-            queue.put("error")
+            queue.put("error: main")
+            sys.exit()
 
     def run_in_thread(self, loop, queue):
         asyncio.set_event_loop(loop)
@@ -121,8 +190,3 @@ if __name__ == "__main__":
     c = MyBlue()
     while True:
         pass
-    # loop = asyncio.new_event_loop()
-    # t = threading.Thread(target=run_in_thread, args=(loop,))
-    # t.daemon = True
-    # t.start()
-    # t.join()  # This will wait for the thread to finish if you want to block the main thread until the worker thread is done
