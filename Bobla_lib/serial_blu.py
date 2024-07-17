@@ -33,7 +33,7 @@ class ConectAudMX(QObject):
 
     # Define the slot method that handles the signal
     def handleBluStartOk(self):
-        # pass
+        print("handleBluStartOk")
         self.SignalSerialStartOk.emit()
     def setHanglerRead(self, hangler):
         self.ser.setHanglerRead(hangler)
@@ -77,14 +77,14 @@ class ConectAudMX(QObject):
         if self.__mod == Mod.SER:
             self.ser.writeSerial(str_)
         else:
-            return
+
             self.blu.write(str_)
 
     def writeByteSerial(self, str_):
         if self.__mod == Mod.SER:
             self.ser.writeByteSerial(str_)
         else:
-            return
-            self.blu.write(str_)
+
+            self.blu.writeBytes(str_)
 
 

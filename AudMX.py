@@ -37,8 +37,10 @@ class MainClass(QWidget):
         super().__init__()
         # self.c = MyBlue()
         # print("sdf")
+        # self.setStyleSheet("QWidget {border-radius: 10px;}")
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
+        self.trayIcon.menu_light.setStyleSheet("border-radius: 10px;")
         self.trayIcon.flag_warning = MenuSettings.readVarningMode(SETTINGS_TRAY)
         self.trayIcon.SignalLIghtMode.connect(lambda mode: self.handleSignalLIghtMode(mode))
 
@@ -57,7 +59,7 @@ class MainClass(QWidget):
         self.timer_setIconNum.timeout.connect(self.setIconNum)
         self.timer_setIconNum.setInterval(250)
         self.ser = ConectAudMX(True)
-        self.update_(True)
+        # self.update_(True)
         self.upDateListOpenProcces()
         self.timer_is_work = QTimer()
         self.timer_is_work.timeout.connect(lambda: self.ser.writeSerial('ISWORK\n'))
@@ -85,6 +87,7 @@ class MainClass(QWidget):
             self.avto_udate_theme.theme = set["theme"]
 
     def hanglerReadSer(self, iner: str):
+        # print("hanglerReadSer:  " + iner)
         if iner.find("BUTTON:") != -1:
             self.keyPleerHandle(iner)
         elif iner.find("|") != -1:
@@ -102,7 +105,10 @@ class MainClass(QWidget):
                     # print("self.loadIconOnESP(0)--hanglerReadSer")
                     self.loadIconOnESP(0)
         elif iner.find("Send 352 bytes") != -1:
+            print("iner.find(Send 352 bytes)")
             self.handleGetIcon()
+        elif iner.find("bluet") != -1:
+            self.trayIcon.masegeWarningBLE()
 
     def upDateListOpenProcces(self):
         # a = AudioUtilities.GetAllSessions()
@@ -113,6 +119,7 @@ class MainClass(QWidget):
         #функция вызываеммая таймером и обновляющяя стиль приложения
         :return: None
         """
+        print(self.ser.doesSerWork)
         if (self.ser.doesSerWork == 1 or tp):
             self.upDateListOpenProcces()
             if (self.last_process_list != self.open_process_list):
@@ -168,6 +175,8 @@ class MainClass(QWidget):
         :param comand: строка с командой типа ''
         :return: NONE
         """
+        if len(self.icon_mass) == 0:
+            return
         comand = str(comand).split("|")
         if (len(comand) != 5):
             return
@@ -214,9 +223,11 @@ class MainClass(QWidget):
         #вызываеться послесигнала о подключении и запускает перврначальную настройку(записывает картинки в микщер)
         :return:
         """
+        print("startMassege")
+        self.ser.writeSerial("ISWORK\n")
         self.last_process_list = []
-        # self.icon_mass.clear()
-        # self.update_(True)
+        self.icon_mass.clear()
+        # self.update_()
         self.num_load_icon = -1
 
     def loadIconOnESP(self, ans=0):
@@ -254,16 +265,6 @@ class MainClass(QWidget):
             self.valve_light.stop()
         QCoreApplication.exit()
 
-
-
-
-from Bobla_lib import test_py_func
-
-# def run_in_thread(loop):
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(main())
-#     print("run_in_thread")
-
 if __name__ == '__main__':
     # loop = asyncio.new_event_loop()
     QCoreApplication.setOrganizationName(ORGANIZATION_NAME)
@@ -271,6 +272,7 @@ if __name__ == '__main__':
     QCoreApplication.setApplicationName(APPLICATION_NAME)
     app = QApplication(sys.argv + ['-platform', 'windows:darkmode=1'])
     app.setQuitOnLastWindowClosed(False)
+    # app.setStyle('Fusion')
     window = MainClass()
     sys.exit(app.exec())
 

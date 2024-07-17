@@ -200,10 +200,3 @@ class VaveLight():
                 vl[1].stop()
         self.__mas_vol_socket.clear()
 
-
-
-
-
-
-
-

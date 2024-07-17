@@ -1,3 +1,6 @@
+
+
+
 QPushButton {
     color: black;
     background: rgba(255, 255, 255, 0.7);
@@ -8,6 +11,7 @@ QPushButton {
     padding: 5px 12px 6px 12px;
     outline: none;
 }
+
 QPushButton:pressed{
     color: rgba(0, 0, 0, 0.63);
     background: rgba(235, 235, 235, 0.5);
@@ -46,10 +50,7 @@ QComboBox:hover,QPushButton:hover,QAbstractSpinBox:hover,QLineEdit:hover,QTextEd
     background: rgba(249, 249, 249, 0.5);
 }
 
-QMenu:hover{
-	background: rgba(249, 249, 249, 0.5);
-	color: rgba(49, 49, 49, 0.5);
-}
+
 
 
 QComboBox:on{
@@ -289,4 +290,55 @@ MaximizeButton {
 CloseButton {
     qproperty-normalColor: black;
     qproperty-normalBackgroundColor: transparent;
+}
+
+
+/* Основной стиль для QMenu */
+QMenu {
+    background-color: #ffffff; /* Фон меню */
+    color: #000000; /* Цвет текста */
+    border: 1px solid #cfcfcf; /* Граница меню */
+    border-radius: 8px; /* Закругленные углы */
+    padding: 5px; /* Внутренний отступ */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.0); /* Тень */
+}
+
+/* Стиль для элементов меню */
+QMenu::item {
+    background-color: transparent; /* Прозрачный фон по умолчанию */
+    padding: 8px 20px; /* Внутренние отступы элементов */
+    margin: 2px 0; /* Внешние отступы элементов */
+}
+
+/* Стиль для выделенного элемента */
+QMenu::item:selected {
+    background-color: #e5e5e5; /* Фон выделенного элемента */
+    color: #000000; /* Цвет текста выделенного элемента */
+    border-radius: 4px; /* Закругленные углы выделенного элемента */
+}
+
+/* Стиль для разделителя */
+QMenu::separator {
+    height: 1px; /* Высота разделителя */
+    background-color: #e5e5e5; /* Цвет разделителя */
+    margin: 5px 10px; /* Отступы для разделителя */
+}
+
+/* Стиль для подменю */
+QMenu::indicator {
+    width: 16px; /* Ширина индикатора подменю */
+    height: 16px; /* Высота индикатора подменю */
+}
+
+QMenu::indicator:checked {
+    image: url(:/path/to/checked_icon.png); /* Иконка для выделенного подменю */
+}
+
+QMenu::indicator:unchecked {
+    image: url(:/path/to/unchecked_icon.png); /* Иконка для неввыделенного подменю */
+}
+
+/* Стиль для подменю (указатель) */
+QMenu::right-arrow {
+    image: url(:/path/to/right_arrow_icon.png); /* Иконка для указателя подменю */
 }

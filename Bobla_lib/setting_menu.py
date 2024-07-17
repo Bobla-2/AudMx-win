@@ -1,6 +1,6 @@
 import sys
 from PySide6.QtWidgets import QCheckBox, QLabel, QPushButton, QComboBox, QDialog, QGridLayout, QApplication
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, Qt
 from PySide6.QtGui import QFont
 from typing import Callable, Dict, Any
 # from threading import Lock, Thread
@@ -50,9 +50,15 @@ class MenuSettings(metaclass=Singleton):
         self.__button = QPushButton("Сохранить")
         self.__button.clicked.connect(self.__safeSettingsApp)
         self.__button.setFont(font)
+        self.__text = QLabel("<a href=\"https://github.com/Bobla-2/AudMx-win/releases/latest\">GitHub</a>")
+        self.__text.setFont(font)
+        # self.__text.setTextFormat(Qt.TextFormat.RichText)
+        # self.__text.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        self.__text.setOpenExternalLinks(True)
 
 
         self.__layout = QGridLayout()
+        self.__layout.addWidget(self.__text, 0, 0, 1, 1)
         self.__layout.addWidget(self.__check_box_1.widget, 1, 1, 1, 1)
         self.__layout.addWidget(self.__check_box_1_lb, 1, 0, 1, 1)
         self.__layout.addWidget(self.__check_box_2.widget, 2, 1, 1, 1)

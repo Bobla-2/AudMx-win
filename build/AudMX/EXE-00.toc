@@ -82,7 +82,7 @@
  [],
  False,
  False,
- 1719395564,
+ 1721150194,
  [('run.exe',
    'C:\\Users\\savva\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
    'EXECUTABLE')],

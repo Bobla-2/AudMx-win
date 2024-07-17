@@ -109,7 +109,9 @@ class seriall(QObject):
         print("ser read: ", self.__inputSrt)
 
         try:
+            print("__handleRead read: ", self.__inputSrt)
             self.__handleRead(self.__inputSrt)
+
         except:
             print("NO SET HANDLER!!!!!!!!")
 
