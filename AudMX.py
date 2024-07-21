@@ -3,18 +3,14 @@ import sys
 import win32con
 import win32api
 from PySide6.QtWidgets import QApplication, QWidget
-# from PySide6.QtGui import QIcon
 from PySide6.QtCore import QTimer, QCoreApplication
-from Bobla_lib.serialLib import SerCDC
 from comtypes import CLSCTX_ALL
 from Bobla_lib.icon_manager import IcomReader, VaveLight
-# from module.resurce import resources
 from Bobla_lib.setting_menu import MenuSettings
+from Bobla_lib.serial_blu import ConectAudMX
 from module.theme.windows_thames import AutoUpdateStile
-# from PySide6.QtGui import QCursor
 from module.tray.trayApp import SystemTrayIcon
 from module.ENUM.enums import LIGHT_MODE, dictVolumeDBtoProsent
-from Bobla_lib.serial_blu import ConectAudMX
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
@@ -24,7 +20,6 @@ SETTINGS_TRAY = 'settings'
 class MainClass(QWidget):
     volLevelApp = []
     __light_mode = -1
-
     last_process_list = []
     num_load_icon = -1
     teat_perer = 0
@@ -35,9 +30,6 @@ class MainClass(QWidget):
     valve_light = None
     def __init__(self):
         super().__init__()
-        # self.c = MyBlue()
-        # print("sdf")
-        # self.setStyleSheet("QWidget {border-radius: 10px;}")
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
         self.trayIcon.menu_light.setStyleSheet("border-radius: 10px;")
@@ -47,9 +39,6 @@ class MainClass(QWidget):
         self.cl_set = {}
         self.trayIcon.SignalActSet.connect(lambda: MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.styleSheet(), self.setSettings))
         self.trayIcon.SignalButtonExit.connect(self.exitApp)
-
-        # self.audioSessions = AudioUtilities.GetAllSessions()
-
         self.timer_2 = QTimer()
         self.timer_2.timeout.connect(self.update_)
         self.timer_2.setInterval(5000)
@@ -74,10 +63,8 @@ class MainClass(QWidget):
         self.ser.autoConnect(vid, pid, 1000000, True)
         self.avto_udate_theme = AutoUpdateStile()
         self.avto_udate_theme.theme = MenuSettings.readThemeMode(SETTINGS_TRAY)
-        # self.trayIcon.setIcon(QIcon(":/icons/iconTrayB.png"))
         self.avto_udate_theme.appendedCallback(self.setStyleSheet, ":/qss/W_sylete", ":/qss/B_sylete", "CSS")
         self.avto_udate_theme.appendedCallback(self.trayIcon.setIcon, ":/icons/iconTrayW.png", ":/icons/iconTrayB.png", "ICON")
-        # timp = Monitor().setAutoSkale(self.window, [(self.frame_left, 100, 100), (self.button_round_test, 80, 60)])
         self.flag_setIconNum = 0
 
     def setSettings(self, set: dict):
@@ -111,7 +98,6 @@ class MainClass(QWidget):
             self.trayIcon.masegeWarningBLE()
 
     def upDateListOpenProcces(self):
-        # a = AudioUtilities.GetAllSessions()
         self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
 
     def update_(self, tp=False):
@@ -266,13 +252,11 @@ class MainClass(QWidget):
         QCoreApplication.exit()
 
 if __name__ == '__main__':
-    # loop = asyncio.new_event_loop()
     QCoreApplication.setOrganizationName(ORGANIZATION_NAME)
     QCoreApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
     QCoreApplication.setApplicationName(APPLICATION_NAME)
     app = QApplication(sys.argv + ['-platform', 'windows:darkmode=1'])
     app.setQuitOnLastWindowClosed(False)
-    # app.setStyle('Fusion')
     window = MainClass()
     sys.exit(app.exec())
 

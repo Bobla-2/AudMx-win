@@ -1,34 +1,29 @@
 from PySide6.QtWidgets import QMenu, QSystemTrayIcon
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtGui import QPainter
 from ..ENUM.enums import LIGHT_MODE
-from PySide6.QtCore import Qt
-
-from PySide6.QtWidgets import QMenu, QWidgetAction, QApplication
-from PySide6.QtGui import QPainter, QColor
-from PySide6.QtCore import Qt
 
 
-class RoundedMenu(QMenu):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+# class RoundedMenu(QMenu):
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+#         # Пример установки радиуса закругления рамок через QSS
+#         self.setStyleSheet("QMenu { border-radius: 10px; }")
+#
+#     def paintEvent(self, event):
+#         # Переопределение метода paintEvent для настройки рисования
+#         painter = QPainter(self)
+#         painter.setRenderHint(QPainter.Antialiasing)
+#         painter.setBrush(self.palette().color(self.backgroundRole()))
+#         painter.setPen(Qt.NoPen)
+#         painter.drawRoundedRect(self.rect(), 10, 10)  # Пример рисования закругленного прямоугольника
+#
+#         super().paintEvent(event)
 
-        # Пример установки радиуса закругления рамок через QSS
-        self.setStyleSheet("QMenu { border-radius: 10px; }")
-
-    def paintEvent(self, event):
-        # Переопределение метода paintEvent для настройки рисования
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(self.palette().color(self.backgroundRole()))
-        painter.setPen(Qt.NoPen)
-        painter.drawRoundedRect(self.rect(), 10, 10)  # Пример рисования закругленного прямоугольника
-
-        super().paintEvent(event)
-
-    def showEvent(self, event):
-        # Переопределение метода showEvent для настройки отображения
-        # Здесь можно делать дополнительные настройки при показе меню
-        super().showEvent(event)
+    # def showEvent(self, event):
+    #     # Переопределение метода showEvent для настройки отображения
+    #     # Здесь можно делать дополнительные настройки при показе меню
+    #     super().showEvent(event)
 
 
 # Пример использования
@@ -43,16 +38,9 @@ class SystemTrayIcon(QSystemTrayIcon):           #класс приложени�
     SignalButtonExit = Signal()
     def __init__(self, parent=None):
         QSystemTrayIcon.__init__(self, parent)
-        # self.activated.connect(self.on_tray_icon_activated)
         self.setToolTip("AudMX")
         self.menu = QMenu(parent)
-        # self.menu.parent().setStyleSheet("border-radius: 10px;")
-        # self.menu.setStyleSheet("border-radius: 10px;")
         print(self.menu.parent())
-
-        # self.menu.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        # self.menu.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-
         self.menu_light = self.menu.addMenu("light")
         self.settings = self.menu.addAction("setting")
         self.Action2 = self.menu.addAction("set BLU")
@@ -71,9 +59,6 @@ class SystemTrayIcon(QSystemTrayIcon):           #класс приложени�
         self.settings.triggered.connect(self.actSet)
         self.activated.connect(self.onTrayIconActivated)
 
-    # def on_tray_icon_activated(self, reason):
-    #     if reason == QSystemTrayIcon.Trigger:  # Это соответствует щелчку левой кнопкой мыши
-    #         self.menu.exec_(self.cursor().pos())
     def onTrayIconActivated(self, reason):
         if reason == QSystemTrayIcon.Trigger:  # Left click
             # self.menu.exec(self.mapToGlobal(reason.pos()))

@@ -1,12 +1,8 @@
 from Bobla_lib.serialLib import SerCDC
-
-from PySide6.QtCore import QIODevice, Signal, QObject, QTimer
-from Bobla_lib.test_py_func import MyBlue
+from PySide6.QtCore import Signal, QObject
+from Bobla_lib.BluetLib import MyBlue
 from enum import Enum
-
-
 import asyncio
-
 
 class Mod(Enum):
     BLU = 0
@@ -19,19 +15,12 @@ class ConectAudMX(QObject):
     __data_to_connect = []
 
     def __init__(self, _):
-
         super(ConectAudMX, self).__init__()
         self.ser = SerCDC(True)
         self.blu = MyBlue(self.handleBluStartOk)
-        # handler = BluetoothHandler()
-        # asyncio.run(handler.main())
-        # self.blu.SignalSerialStartOk.connect(lambda : print("2093847"))
         self.ser.SignalSerialStartOk.connect(self.SignalSerialStartOk.emit)
         # self.blu.SignalBluStartOk.connect(self.SignalSerialStartOk.emit)
 
-    # Connect the signal to a slot
-
-    # Define the slot method that handles the signal
     def handleBluStartOk(self):
         print("handleBluStartOk")
         self.SignalSerialStartOk.emit()
@@ -72,12 +61,10 @@ class ConectAudMX(QObject):
         else:
             self.blu.autoConnect("AudMX")
 
-
     def writeSerial(self, str_):
         if self.__mod == Mod.SER:
             self.ser.writeSerial(str_)
         else:
-
             self.blu.write(str_)
 
     def writeByteSerial(self, str_):

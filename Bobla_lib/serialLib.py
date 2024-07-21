@@ -1,7 +1,6 @@
 from PySide6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PySide6.QtCore import QIODevice, Signal, QObject, QTimer
 
-
 class seriall(QObject):
     SignalReadPort = Signal(list)
     SignalSerialRegOk = Signal()
@@ -207,5 +206,3 @@ class SerCDC(seriall):
                     self.__timer_cdc.start()
             else:
                 self.__timer_cdc.stop()
-
-

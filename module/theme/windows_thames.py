@@ -1,9 +1,8 @@
 import winreg
-import sys
-import os
 from PySide6.QtCore import QTimer, QFile, QIODevice, QTextStream
 from PySide6.QtGui import QIcon
 from module.resurce import resources
+
 reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
 reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
 
@@ -104,8 +103,6 @@ class AutoUpdateStile():
         else:
             self.__timer.start()
             self.__setStyle(self.__old_theme)
-
-
 
     def removeCallback(self, callback: object):
         for cb in self.__callback:

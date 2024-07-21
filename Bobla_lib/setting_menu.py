@@ -1,21 +1,17 @@
 import sys
-from PySide6.QtWidgets import QCheckBox, QLabel, QPushButton, QComboBox, QDialog, QGridLayout, QApplication
-from PySide6.QtCore import QSettings, Qt
+from PySide6.QtWidgets import QLabel, QPushButton, QComboBox, QDialog, QGridLayout
+from PySide6.QtCore import QSettings
 from PySide6.QtGui import QFont
 from typing import Callable, Dict, Any
-# from threading import Lock, Thread
 from Bobla_lib.single_ton_meta import Singleton
-# from Bobla_lib.monitor_func import Monitor
 from module.bobla_widgets.button import CheckButton
-from PySide6.QtCore import QIODevice, Signal
+
 
 class MenuSettings(metaclass=Singleton):
     __set_tray = ""
     __app_name = ""
 
-
     def __init__(self, set_tray: str, app_name: str, style: str, func: Callable[[Dict[str, Any]], Any]):
-        # super().__init__(parent)
         self.cl = func
         self.__set_tray = set_tray
         self.__app_name = app_name
@@ -52,8 +48,6 @@ class MenuSettings(metaclass=Singleton):
         self.__button.setFont(font)
         self.__text = QLabel("<a href=\"https://github.com/Bobla-2/AudMx-win/releases/latest\">GitHub</a>")
         self.__text.setFont(font)
-        # self.__text.setTextFormat(Qt.TextFormat.RichText)
-        # self.__text.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         self.__text.setOpenExternalLinks(True)
 
 
@@ -63,8 +57,6 @@ class MenuSettings(metaclass=Singleton):
         self.__layout.addWidget(self.__check_box_1_lb, 1, 0, 1, 1)
         self.__layout.addWidget(self.__check_box_2.widget, 2, 1, 1, 1)
         self.__layout.addWidget(self.__check_box_2_lb, 2, 0, 1, 1)
-        # self.__layout.addWidget(self.__check_box_3.widget, 3, 1, 1, 1)
-        # self.__layout.addWidget(self.__check_box_3_lb, 3, 0, 1, 1)
         self.__layout.addWidget(self.__set_theme_1, 4, 1, 1, 1)
         self.__layout.addWidget(self.__set_theme_1_lb, 4, 0, 1, 1)
         self.__layout.addWidget(self.__button, 5, 0, 1, 2)
@@ -77,15 +69,13 @@ class MenuSettings(metaclass=Singleton):
 
         self.dialog.show()
         self.dialog.closeEvent = self.on_close
-        # self.timp = Monitor()
-        # self.timp.appendWindow(self.dialog, self.items)
+
     @property
     def items(self):
         return []
         # return [self.__check_box_3, self.__check_box_3_lb, self.__check_box_1, self.__check_box_1_lb, self.__check_box_2, self.__check_box_2_lb, self.__set_theme_1, self.__set_theme_1_lb, self.__button]
 
     def on_close(self, event):
-        # self.timp.removeWindow(self.dialog)
         self.__class__._remove_instance()
         del self
 

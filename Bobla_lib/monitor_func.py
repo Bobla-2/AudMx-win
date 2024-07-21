@@ -1,10 +1,8 @@
-from PySide6.QtWidgets import QApplication, QWidget
 from PySide6 import QtGui
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QMainWindow
-from PySide6.QtCore import QObject
+from PySide6.QtWidgets import QApplication, QWidget, QMainWindow
 from Bobla_lib.single_ton_meta import Singleton
 
-from typing import List, Tuple, Any
+from typing import List
 class Monitor(metaclass=Singleton):
     __abj = []
     __dict_monitor = {}
@@ -31,8 +29,6 @@ class Monitor(metaclass=Singleton):
         :return: None
         '''
         self.__dict_monitor = self.getDictMonitor()
-
-
 
     def appendWindow(self,  obj_adr: QMainWindow, items: List[QWidget]) -> None:
         self.__abj = obj_adr
