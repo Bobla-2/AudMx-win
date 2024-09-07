@@ -90,4 +90,4 @@ class SystemTrayIcon(QSystemTrayIcon):           #класс приложени�
         if self.flag_warning:
             self.showMessage("ERROR BLUETOOTH", "bluet. off")
             self.show()
-            print("1234")
+            # print("1234")

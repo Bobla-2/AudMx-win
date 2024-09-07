@@ -95,25 +95,35 @@
 #
 #     return out
 # print(threeSum([-2,0,1,1,2]))
-class TreeNode:
-    def __init__(self, val=0, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
-drt = TreeNode(1, TreeNode(2), TreeNode(4))
-def hasPathSum( root, targetSum: int) -> bool:
-    if root != None:
-        targetSum = targetSum - root.val
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+# drt = TreeNode(1, TreeNode(2), TreeNode(4))
+# def hasPathSum( root, targetSum: int) -> bool:
+#     if root != None:
+#         targetSum = targetSum - root.val
+#
+#         if targetSum == 0:
+#             return True
+#         if hasPathSum(root.left, targetSum):
+#             return True
+#         if hasPathSum(root.right, targetSum):
+#             return True
+#
+#     return False
+#
+#
+#
+# print(hasPathSum(drt, 5))
 
-        if targetSum == 0:
-            return True
-        if hasPathSum(root.left, targetSum):
-            return True
-        if hasPathSum(root.right, targetSum):
-            return True
-
-    return False
 
 
+class test():
+    tmp = 1
 
-print(hasPathSum(drt, 5))
+sd = test()
+md = test()
+test.tmp = 3
+print(md.tmp)

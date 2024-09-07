@@ -30,6 +30,7 @@ class MainClass(QWidget):
     valve_light = None
     def __init__(self):
         super().__init__()
+
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
         self.trayIcon.menu_light.setStyleSheet("border-radius: 10px;")
@@ -75,7 +76,7 @@ class MainClass(QWidget):
 
     def hanglerReadSer(self, iner: str):
         # print("hanglerReadSer:  " + iner)
-        if iner.find("BUTTON:") != -1:
+        if iner.find("BUTTON") != -1:
             self.keyPleerHandle(iner)
         elif iner.find("|") != -1:
             if (iner != self.__comand_Buff):
@@ -105,15 +106,14 @@ class MainClass(QWidget):
         #функция вызываеммая таймером и обновляющяя стиль приложения
         :return: None
         """
-        print(self.ser.doesSerWork)
+        # print(self.ser.doesSerWork)
         if (self.ser.doesSerWork == 1 or tp):
             self.upDateListOpenProcces()
             if (self.last_process_list != self.open_process_list):
                 IcomReader.setLastLevel(self.icon_mass, 0)
-                self.volLevelApp = []
                 self.last_process_list = self.open_process_list
                 tempp = IcomReader.loadIcons(sys.argv[0][:sys.argv[0].rindex("\\")] + ".\\icon", self.open_process_list, 5)
-                if ([i.name for i in tempp] != [i.name for i in self.icon_mass]):
+                if ((i.name for i in tempp) != (i.name for i in self.icon_mass)):
                     self.icon_mass = tempp
                     self.ser.clearnQuwewe()
                     self.ser.clearnSend()
@@ -130,30 +130,16 @@ class MainClass(QWidget):
         :return: NONE
         """
         comand = str(comand).split("|")
-        comand[1] = int(comand[1])
-        if (comand[0] == "realised"):
-            if (self.__count_presed_button > 0):
-                self.__count_presed_button = 0
-                return
-            if comand[1] == 1:
+        if (comand[1] == "pressed"):
+            if comand[2][0] == "1":
                 win32api.keybd_event(win32con.VK_MEDIA_PLAY_PAUSE, 0, 0, 0)
                 win32api.keybd_event(win32con.VK_MEDIA_PLAY_PAUSE, 0, win32con.KEYEVENTF_KEYUP, 0)
-            elif comand[1] == 0:
+            elif comand[2][0] == "0":
                 win32api.keybd_event(win32con.VK_MEDIA_NEXT_TRACK, 0, 0, 0)
                 win32api.keybd_event(win32con.VK_MEDIA_NEXT_TRACK, 0, win32con.KEYEVENTF_KEYUP, 0)
-            elif comand[1] == 2:
+            elif comand[2][0] == "2":
                 win32api.keybd_event(win32con.VK_MEDIA_PREV_TRACK, 0, 0, 0)
                 win32api.keybd_event(win32con.VK_MEDIA_PREV_TRACK, 0, win32con.KEYEVENTF_KEYUP, 0)
-
-        else:
-            self.__count_presed_button += 1
-            if (self.__count_presed_button > 10):
-                if comand[1] == 1:
-                    pass
-                elif comand[1] == 0:
-                    pass
-                elif comand[1] == 2:
-                    pass
 
     def levelVolHandle(self, comand: str) -> None:
         """
@@ -161,9 +147,9 @@ class MainClass(QWidget):
         :param comand: строка с командой типа ''
         :return: NONE
         """
-        if len(self.icon_mass) == 0:
+        if not self.icon_mass:
             return
-        comand = str(comand).split("|")
+        comand = comand.split("|")
         if (len(comand) != 5):
             return
         self.audioSessions = AudioUtilities.GetAllSessions()
@@ -259,4 +245,3 @@ if __name__ == '__main__':
     app.setQuitOnLastWindowClosed(False)
     window = MainClass()
     sys.exit(app.exec())
-
