@@ -1,5 +1,5 @@
 ('C:\\Users\\savva\\Documents\\github\\AudMx-win\\build\\AudMX\\AudMX.exe',
- True,
+ False,
  False,
  True,
  ['C:\\Users\\savva\\Documents\\github\\AudMx-win\\resurce\\icon.ico'],
@@ -82,8 +82,8 @@
  [],
  False,
  False,
- 1723036560,
- [('run.exe',
-   'C:\\Users\\savva\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
+ 1727124232,
+ [('runw.exe',
+   'C:\\Users\\savva\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
    'EXECUTABLE')],
  'C:\\Users\\savva\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll')

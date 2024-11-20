@@ -4,16 +4,19 @@ from PySide6.QtCore import QSettings
 from PySide6.QtGui import QFont
 from typing import Callable, Dict, Any
 from Bobla_lib.single_ton_meta import Singleton
+from Bobla_lib.setting_menu_button import MenuSettingsButtonModule
 from module.bobla_widgets.button import CheckButton
-# import gc
+import gc
+from module.theme.windows_thames import AutoUpdateStile
 
 class MenuSettings(metaclass=Singleton):
-    def __init__(self, set_tray: str, app_name: str, style: str, func: Callable[[Dict[str, Any]], Any]):
+    def __init__(self, set_tray: str, app_name: str, func: Callable[[Dict[str, Any]], Any]):
         self.cl = func
         self.__set_tray: str = set_tray
         self.__app_name: str = app_name
+        # self.stl = style
         self.dialog = QDialog()
-        self.dialog.setStyleSheet(style)
+        # self.dialog.setStyleSheet(style)
         font = QFont()
         font.setFamily("Yu Gothic UI Semibold")
         font.setPointSize(int(12))
@@ -40,13 +43,15 @@ class MenuSettings(metaclass=Singleton):
         self.__set_theme_1_lb = QLabel("тема")
         self.__set_theme_1_lb.setObjectName("grei")
         self.__set_theme_1_lb.setFont(font)
+        self.__bt_set_bt = QPushButton("Функции кнопок")
+        self.__bt_set_bt.clicked.connect(self.openButtonMenu)
+        self.__bt_set_bt.setFont(font)
         self.__button = QPushButton("Сохранить")
         self.__button.clicked.connect(self.__safeSettingsApp)
         self.__button.setFont(font)
         self.__text = QLabel("<a href=\"https://github.com/Bobla-2/AudMx-win/releases/latest\">GitHub</a>")
         self.__text.setFont(font)
         self.__text.setOpenExternalLinks(True)
-
 
         self.__layout = QGridLayout()
         self.__layout.addWidget(self.__text, 0, 0, 1, 1)
@@ -56,7 +61,8 @@ class MenuSettings(metaclass=Singleton):
         self.__layout.addWidget(self.__check_box_2_lb, 2, 0, 1, 1)
         self.__layout.addWidget(self.__set_theme_1, 4, 1, 1, 1)
         self.__layout.addWidget(self.__set_theme_1_lb, 4, 0, 1, 1)
-        self.__layout.addWidget(self.__button, 5, 0, 1, 2)
+        self.__layout.addWidget(self.__bt_set_bt, 5, 0, 1, 1)
+        self.__layout.addWidget(self.__button, 6, 0, 1, 2)
         self.dialog.setLayout(self.__layout)
 
         self.__set_theme_1.setCurrentText(QSettings().value(f"{self.__set_tray}/theme", False, type=str))
@@ -66,13 +72,29 @@ class MenuSettings(metaclass=Singleton):
 
         self.dialog.show()
         self.dialog.closeEvent = self.on_close
+    def openButtonMenu(self):
+        self._button_menu = MenuSettingsButtonModule(self.__set_tray, self.__app_name, self.cl)
+        self.avto_udate_theme = AutoUpdateStile()
+        self.avto_udate_theme.appendedCallback(self._button_menu.dialog.setStyleSheet, ":/qss/W_sylete",
+                                               ":/qss/B_sylete", "CSS")
+        self.avto_udate_theme.removeCallback(self._button_menu.dialog.setStyleSheet)
+
 
     @property
     def items(self):
         return ()
-    def on_close(self, _):
+    def on_close(self, _=None):
+        if not _:
+            self.dialog.close()
+            return
+        if hasattr(self, "_button_menu"):
+            del self._button_menu
         self.__class__._remove_instance()
+        # referrers = gc.get_referrers(self.__check_box_1)
+        # print("1", referrers)
+        self.dialog.deleteLater()
         del self
+        gc.collect()
 
     def __safeSettingsApp(self):
         settings = QSettings()
@@ -94,6 +116,8 @@ class MenuSettings(metaclass=Singleton):
         else:
             tmp["theme"] = "system"
         self.cl(tmp)
+        self.on_close()
+        del self
 
     @staticmethod
     def readThemeMode(__set_tray: str) -> str:

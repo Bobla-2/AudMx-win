@@ -8,13 +8,14 @@ from comtypes import CLSCTX_ALL
 from Bobla_lib.icon_manager import IcomReader, VaveLight
 from Bobla_lib.setting_menu import MenuSettings
 from Bobla_lib.serial_blu import ConectAudMX
+from Bobla_lib.setting_menu_button import MenuSettingsButtonModule, ButtonModuleFunc
 from module.theme.windows_thames import AutoUpdateStile
 from module.tray.trayApp import SystemTrayIcon
 from module.ENUM.enums import LIGHT_MODE, dictVolumeDBtoProsent
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
-APPLICATION_NAME = 'AudMX v1'
+APPLICATION_NAME = 'AudMX v1.4'
 SETTINGS_TRAY = 'settings'
 
 class MainClass(QWidget):
@@ -38,7 +39,7 @@ class MainClass(QWidget):
         self.trayIcon.SignalLIghtMode.connect(lambda mode: self.handleSignalLIghtMode(mode))
 
         self.cl_set = {}
-        self.trayIcon.SignalActSet.connect(lambda: MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.styleSheet(), self.setSettings))
+        self.trayIcon.SignalActSet.connect(self.openMenuSettings)
         self.trayIcon.SignalButtonExit.connect(self.exitApp)
         self.timer_2 = QTimer()
         self.timer_2.timeout.connect(self.update_)
@@ -67,17 +68,32 @@ class MainClass(QWidget):
         self.avto_udate_theme.appendedCallback(self.setStyleSheet, ":/qss/W_sylete", ":/qss/B_sylete", "CSS")
         self.avto_udate_theme.appendedCallback(self.trayIcon.setIcon, ":/icons/iconTrayW.png", ":/icons/iconTrayB.png", "ICON")
         self.flag_setIconNum = 0
+        self.button_handler = ButtonModuleFunc()
+        self.setSettings(MenuSettingsButtonModule.readBTMode(SETTINGS_TRAY))
 
     def setSettings(self, set: dict):
+
         if 'warning' in set:
             self.trayIcon.flag_warning = set["warning"]
         if 'theme' in set:
             self.avto_udate_theme.theme = set["theme"]
+        if 'BT' in set:
+            self.button_handler.setFunc(set["BT"])
+            # del self.menu._button_menu
+        else:
+            del self.menu
+    def openMenuSettings(self):
+        self.menu = MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.setSettings)
+        self.avto_udate_theme = AutoUpdateStile()
+        self.avto_udate_theme.appendedCallback(self.menu.dialog.setStyleSheet, ":/qss/W_sylete",
+                                               ":/qss/B_sylete", "CSS")
+        self.avto_udate_theme.removeCallback(self.menu.dialog.setStyleSheet)
+
 
     def hanglerReadSer(self, iner: str):
         # print("hanglerReadSer:  " + iner)
         if iner.find("BUTTON") != -1:
-            self.keyPleerHandle(iner)
+            self.button_handler.hanglerBT(iner)
         elif iner.find("|") != -1:
             if (iner != self.__comand_Buff):
                 self.__comand_Buff = iner
@@ -123,23 +139,7 @@ class MainClass(QWidget):
                         print("self.loadIconOnESP(1)--update_")
                         self.loadIconOnESP(1)
 
-    def keyPleerHandle(self, comand: str) -> None:
-        """
-        #обработчик команд из сериал порта и иниирующий нажатия кнопок плеера
-        :param comand: строка с командой типа ''
-        :return: NONE
-        """
-        comand = str(comand).split("|")
-        if (comand[1] == "pressed"):
-            if comand[2][0] == "1":
-                win32api.keybd_event(win32con.VK_MEDIA_PLAY_PAUSE, 0, 0, 0)
-                win32api.keybd_event(win32con.VK_MEDIA_PLAY_PAUSE, 0, win32con.KEYEVENTF_KEYUP, 0)
-            elif comand[2][0] == "0":
-                win32api.keybd_event(win32con.VK_MEDIA_NEXT_TRACK, 0, 0, 0)
-                win32api.keybd_event(win32con.VK_MEDIA_NEXT_TRACK, 0, win32con.KEYEVENTF_KEYUP, 0)
-            elif comand[2][0] == "2":
-                win32api.keybd_event(win32con.VK_MEDIA_PREV_TRACK, 0, 0, 0)
-                win32api.keybd_event(win32con.VK_MEDIA_PREV_TRACK, 0, win32con.KEYEVENTF_KEYUP, 0)
+
 
     def levelVolHandle(self, comand: str) -> None:
         """

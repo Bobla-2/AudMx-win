@@ -121,7 +121,7 @@ class IcomReader():
         :return: массив байтовых строк
         """
 
-        name_list_open = (item[0] for item in poccess_list)
+        name_list_open = [item[0] for item in poccess_list]
         icon_mass = []
 
         for filename in os.listdir(folder_path):

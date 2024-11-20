@@ -39,9 +39,10 @@ class Monitor(metaclass=Singleton):
         self.__abj.show()
 
     def removeWindow(self, window):
-        for wd in self.__list_window:
-            if wd[0] == window:
-                del wd
+        for num in range(len(self.__list_window)):
+            if self.__list_window[num][0] == window:
+                del self.__list_window[num]
+                break
     def __editSize(self, screen_name: str) -> None:
         return
         self.__font = QtGui.QFont()

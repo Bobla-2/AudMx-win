@@ -10,23 +10,19 @@ class ThemesWindows():
 
     @staticmethod
     def getStyle():
-
         try:
             reg_key = winreg.OpenKey(reg, reg_path)
         except FileNotFoundError:
             pass
-
         for i in range(1024):
             try:
                 value_name, value, _ = winreg.EnumValue(reg_key, i)
                 if value_name == 'SystemUsesLightTheme':
-
                     return value
             except:
                 pass
     @staticmethod
     def getCSSFile(theme: int, path_to_W: str, path_to_B: str) -> str:
-
         if theme == 0:
             stream = QFile(path_to_B)
             stream.open(QIODevice.ReadOnly)
@@ -47,6 +43,15 @@ class ThemesWindows():
             return QIcon(path_to_W)
         return None
 
+def singleton(cls):
+    instances = {}
+    def get_instance(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    return get_instance
+
+@singleton
 class AutoUpdateStile():
     __callback = []
     __old_theme = -1
@@ -105,6 +110,7 @@ class AutoUpdateStile():
             self.__setStyle(self.__old_theme)
 
     def removeCallback(self, callback: object):
-        for cb in self.__callback:
-            if cb[0] == callback:
-                del cb
+        for num in range(len(self.__callback)):
+            if self.__callback[num][0] == callback:
+                del self.__callback[num]
+                break

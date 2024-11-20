@@ -7,6 +7,7 @@ class LIGHT_MODE(Enum):
     VOLUME_LEVEL = 4
     WAVE = 5
 
+
 dictVolumeDBtoProsent = (-65.25,
                          -64.49,
                          -58.17,
