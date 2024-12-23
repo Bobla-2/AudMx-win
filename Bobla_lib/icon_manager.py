@@ -1,7 +1,7 @@
 
 import os
-from PIL import Image
-from module.volume_soket.volume_socket import SocketVolume
+# from PIL import Image
+# from module.volume_soket.volume_socket import SocketVolume
 # import sys
 from PySide6.QtCore import QTimer
 # from memory_profiler import profile
@@ -9,17 +9,13 @@ class IconCl(object):
     """
     This class represents an icon object for AdMX. the object contains all the properties of the icon.
     """
-
     __slots__ = (
         '_icon', '_num', '_state', '_name', '_path', '_volume_level',
         '_last_volume_level', '_socket', '_pid'
     )
-
     """
     This class represents an icon object for AdMX. The object contains all the properties of the icon.
     """
-
-
     def __init__(self, path: str, num: int = -1):
         self._icon: bytes = None
         self._num: int = num
@@ -50,16 +46,26 @@ class IconCl(object):
     def __bmp_to_byte_array(self, image_path: str) -> bytes:
         """
         #преобразование картинок в байт массив
-        :param image_path: - путь к иконками
+        :param image_path: - путь к иконкам
         :return: байт массив
         """
-        img = Image.open(image_path)
-        if img.mode != '1':
-            print(image_path)
-            self._path = ""
-            self._name = ""
-            return bytes(352)
-        return img.tobytes()
+        with open(image_path, 'rb') as f:
+            bmp_data = f.read()
+            reversed_data = [bmp_data[i:i + 8] for i in range(62, len(bmp_data), 8)]
+            reversed_data = reversed_data[::-1]
+            flat_reversed_data = [item for sublist in reversed_data for item in sublist]
+            # if int(bmp_data[28:29]) != 1:
+            #
+            #     print(bmp_data)
+        return flat_reversed_data
+
+        # img = Image.open(image_path)
+        # if img.mode != '1':
+        #     # print(image_path)
+        #     self._path = ""
+        #     self._name = ""
+        #     return bytes(352)
+        # return img.tobytes()
     @property
     def num(self) -> int:
         return self._num
@@ -150,61 +156,54 @@ class IcomReader():
             ms.last_volume_level = level
 
 
-class VaveLight():
-    __old_pid = []
-    __mas_vol_socket = []
-    __serW = None
-    def __init__(self, mas_icon: list[IconCl], serWrite):
-        self.__serW = serWrite
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.__sendCom)
-        self.timer.setInterval(33)
-        for icon in mas_icon:
-            if icon.pid != -1:
-                self.__mas_vol_socket.append([icon.num, SocketVolume(icon.pid), 0.])
-            else:
-                self.__mas_vol_socket.append([icon.num, 0., -1])
-            self.__old_pid.append(icon.pid)
-
-    @property
-    def volume(self):
-        return [float(it[1]) for it in self.__mas_vol_socket]
-
-    def __sendCom(self):
-
-        com = ""
-        for it in self.volume:
-            com += str(it*3) + "|"
-        print(self.__mas_vol_socket)
-
-
-        self.__serW("VOL:"+ com[:-1] + "\n\r")
-    def avtoUpdateStop(self):
-        self.timer.stop()
-        self.timer.blockSignals(True)
-    def avtoUpdateStart(self):
-        self.timer.start()
-        self.timer.blockSignals(False)
-
-    def updateList(self,  mas_icon: list[IconCl]):
-        new_pid = [icon.pid for icon in mas_icon]
-        if len(new_pid) == len(self.__old_pid):
-            for i in range(len(self.__old_pid)):
-                if self.__old_pid[i] != new_pid[i]:
-                    del self.__mas_vol_socket[i]
-                    self.__mas_vol_socket.insert(i, [i, SocketVolume(mas_icon[i].pid), 0.])
-                    # return
-        # elif len(new_pid) == len(self.__old_pid) - 1:
-        #     for i in range(len(self.__old_pid)):
-        #         if self.__old_pid[i] != new_pid[i]:
-        #             self.__mas_vol_socket[i].stop()
-        #             self.__mas_vol_socket.pop(i)
-        #             return
-    def stop(self):
-
-        for vl in self.__mas_vol_socket:
-            if vl[2] != -1:
-                print(vl)
-                vl[1].stop()
-        self.__mas_vol_socket.clear()
-
+# class VaveLight():
+#     __old_pid = []
+#     __mas_vol_socket = []
+#     __serW = None
+#     def __init__(self, mas_icon: list[IconCl], serWrite):
+#         self.__serW = serWrite
+#         self.timer = QTimer()
+#         self.timer.timeout.connect(self.__sendCom)
+#         self.timer.setInterval(33)
+#         for icon in mas_icon:
+#             if icon.pid != -1:
+#                 self.__mas_vol_socket.append([icon.num, SocketVolume(icon.pid), 0.])
+#             else:
+#                 self.__mas_vol_socket.append([icon.num, 0., -1])
+#             self.__old_pid.append(icon.pid)
+#
+#     @property
+#     def volume(self):
+#         return [float(it[1]) for it in self.__mas_vol_socket]
+#
+#     def __sendCom(self):
+#
+#         com = ""
+#         for it in self.volume:
+#             com += str(it*3) + "|"
+#         print(self.__mas_vol_socket)
+#
+#
+#         self.__serW("VOL:"+ com[:-1] + "\n\r")
+#     def avtoUpdateStop(self):
+#         self.timer.stop()
+#         self.timer.blockSignals(True)
+#     def avtoUpdateStart(self):
+#         self.timer.start()
+#         self.timer.blockSignals(False)
+#
+#     def updateList(self,  mas_icon: list[IconCl]):
+#         new_pid = [icon.pid for icon in mas_icon]
+#         if len(new_pid) == len(self.__old_pid):
+#             for i in range(len(self.__old_pid)):
+#                 if self.__old_pid[i] != new_pid[i]:
+#                     del self.__mas_vol_socket[i]
+#                     self.__mas_vol_socket.insert(i, [i, SocketVolume(mas_icon[i].pid), 0.])
+#
+#     def stop(self):
+#         for vl in self.__mas_vol_socket:
+#             if vl[2] != -1:
+#                 print(vl)
+#                 vl[1].stop()
+#         self.__mas_vol_socket.clear()
+#

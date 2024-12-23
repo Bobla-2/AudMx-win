@@ -1,5 +1,6 @@
 from PySide6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PySide6.QtCore import QIODevice, Signal, QObject, QTimer
+from module.logger.logger import SimpleLogger
 
 class seriall(QObject):
     SignalReadPort = Signal(list)
@@ -18,7 +19,7 @@ class seriall(QObject):
 
     def __init__(self):
         super().__init__()
-
+        self.__logger = SimpleLogger()
         self.__serial = QSerialPort()
         self.__serial.errorOccurred.connect(self.__handleError)
         self.__flag_read_data = False
@@ -108,6 +109,7 @@ class seriall(QObject):
         print("ser read: ", self.__inputSrt)
 
         try:
+            self.__logger.log(f"__handleRead read:  {self.__inputSrt}")
             print("__handleRead read: ", self.__inputSrt)
             self.__handleRead(self.__inputSrt)
 

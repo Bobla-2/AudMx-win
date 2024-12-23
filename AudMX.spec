@@ -5,13 +5,14 @@ a = Analysis(
     ['AudMX.py'],
     pathex=[],
     binaries=[],
-    datas=[('.\\module\\volume_soket\\msvcp140d.dll', '.'), ('.\\module\\volume_soket\\ucrtbased.dll', '.'), ('.\\module\\volume_soket\\vcruntime140_1d.dll', '.'), ('.\\module\\volume_soket\\vcruntime140d.dll', '.'), ('.\\module\\volume_soket\\volumepid.exe', '.')],
-    hiddenimports=['pycaw', 'Pillow', 'ctype', 'pywin32'],
+    datas=[],
+    hiddenimports=['pycaw', 'ctype', 'pywin32'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
+    optimize=0,
 )
 pyz = PYZ(a.pure)
 
@@ -31,7 +32,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['C:\\Users\\savva\\Documents\\github\\AudMx-win\\resurce\\icon.ico'],
+    icon=['C:\\Users\\savva\\Documents\\github\\AudMx-win\\icon.ico'],
 )
 coll = COLLECT(
     exe,

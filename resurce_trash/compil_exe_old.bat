@@ -1,0 +1,2 @@
+@echo off
+start cmd /k "pyinstaller -i "C:\Users\savva\Documents\github\AudMx-win\resurce\icon.ico" --hidden-import pycaw  --hidden-import Pillow  --hidden-import ctype  --hidden-import pywin32 --add-data=".\module\volume_soket\msvcp140d.dll;." --add-data=".\module\volume_soket\ucrtbased.dll;." --add-data=".\module\volume_soket\vcruntime140_1d.dll;." --add-data=".\module\volume_soket\vcruntime140d.dll;." --add-data=".\module\volume_soket\volumepid.exe;." -w AudMX.py"

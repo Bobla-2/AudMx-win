@@ -3,6 +3,7 @@ from PySide6.QtCore import Signal, QObject
 from Bobla_lib.BluetLib import MyBlue
 from enum import Enum
 import asyncio
+from module.logger.logger import SimpleLogger
 
 class Mod(Enum):
     BLU = 0
@@ -15,6 +16,7 @@ class ConectAudMX(QObject):
     __data_to_connect = []
 
     def __init__(self, _):
+        self.__logger = SimpleLogger()
         super(ConectAudMX, self).__init__()
         self.ser = SerCDC(True)
         self.blu = MyBlue(self.handleBluStartOk)
@@ -62,12 +64,15 @@ class ConectAudMX(QObject):
             self.blu.autoConnect("AudMX")
 
     def writeSerial(self, str_):
+        self.__logger.log(f"def writeSerial:  {str_}")
         if self.__mod == Mod.SER:
             self.ser.writeSerial(str_)
         else:
             self.blu.write(str_)
 
+
     def writeByteSerial(self, str_):
+        self.__logger.log(f"def writeByteSerial:  {str_}")
         if self.__mod == Mod.SER:
             self.ser.writeByteSerial(str_)
         else:

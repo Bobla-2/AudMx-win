@@ -1,26 +1,40 @@
-import winreg
+import platform
 from PySide6.QtCore import QTimer, QFile, QIODevice, QTextStream
 from PySide6.QtGui import QIcon
 from module.resurce import resources
+reg = None
+reg_path = None
+system_name = platform.system()
+try:
+    if system_name == "Windows":
+        import winreg
+        reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+        reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
+except:
+    pass
 
-reg = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
-reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize'
-
-class ThemesWindows():
+class ThemesWindows:
 
     @staticmethod
     def getStyle():
-        try:
-            reg_key = winreg.OpenKey(reg, reg_path)
-        except FileNotFoundError:
-            pass
-        for i in range(1024):
+        global system_name
+        global reg
+        global reg_path
+        if system_name == "Windows":
+
             try:
-                value_name, value, _ = winreg.EnumValue(reg_key, i)
-                if value_name == 'SystemUsesLightTheme':
-                    return value
-            except:
+                reg_key = winreg.OpenKey(reg, reg_path)
+            except FileNotFoundError:
                 pass
+
+            for i in range(1024):
+                try:
+                    value_name, value, _ = winreg.EnumValue(reg_key, i)
+                    if value_name == 'SystemUsesLightTheme':
+                        return value
+                except:
+                    pass
+        return 0
     @staticmethod
     def getCSSFile(theme: int, path_to_W: str, path_to_B: str) -> str:
         if theme == 0:
@@ -114,3 +128,4 @@ class AutoUpdateStile():
             if self.__callback[num][0] == callback:
                 del self.__callback[num]
                 break
+

@@ -1,2 +1,13 @@
 
 /dist
+*.log
+*.txt
+*.pyc
+*.pyc
+module/vk_log_bot/config.py
+module/vk_log_bot/crypt_token.py
+*.pyc
+*.pyc
+/Bobla_lib/__pycache__
+/build
+/build

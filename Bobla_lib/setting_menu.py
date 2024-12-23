@@ -7,7 +7,7 @@ from Bobla_lib.single_ton_meta import Singleton
 from Bobla_lib.setting_menu_button import MenuSettingsButtonModule
 from module.bobla_widgets.button import CheckButton
 import gc
-from module.theme.windows_thames import AutoUpdateStile
+from module.UI_manager.theme.windows_thames import AutoUpdateStile
 
 class MenuSettings(metaclass=Singleton):
     def __init__(self, set_tray: str, app_name: str, func: Callable[[Dict[str, Any]], Any]):

@@ -2,20 +2,22 @@ from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume, IAudioEndpointVolume
 import sys
 import win32con
 import win32api
+# import tracemalloc
+
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import QTimer, QCoreApplication
 from comtypes import CLSCTX_ALL
-from Bobla_lib.icon_manager import IcomReader, VaveLight
+from Bobla_lib.icon_manager import IcomReader #, VaveLight
 from Bobla_lib.setting_menu import MenuSettings
 from Bobla_lib.serial_blu import ConectAudMX
 from Bobla_lib.setting_menu_button import MenuSettingsButtonModule, ButtonModuleFunc
-from module.theme.windows_thames import AutoUpdateStile
-from module.tray.trayApp import SystemTrayIcon
-from module.ENUM.enums import LIGHT_MODE, dictVolumeDBtoProsent
+from module.UI_manager.theme.windows_thames import AutoUpdateStile
+from module.UI.tray.trayApp import SystemTrayIcon
+from module.ENUM.enums import dictVolumeDBtoProsent# LIGHT_MODE,
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
-APPLICATION_NAME = 'AudMX v1.4'
+APPLICATION_NAME = 'AudMX v1.5'
 SETTINGS_TRAY = 'settings'
 
 class MainClass(QWidget):
@@ -31,12 +33,12 @@ class MainClass(QWidget):
     valve_light = None
     def __init__(self):
         super().__init__()
-
+        # tracemalloc.start()
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
-        self.trayIcon.menu_light.setStyleSheet("border-radius: 10px;")
+        # self.trayIcon.menu_light.setStyleSheet("border-radius: 10px;")
         self.trayIcon.flag_warning = MenuSettings.readVarningMode(SETTINGS_TRAY)
-        self.trayIcon.SignalLIghtMode.connect(lambda mode: self.handleSignalLIghtMode(mode))
+        # self.trayIcon.SignalLIghtMode.connect(lambda mode: self.handleSignalLIghtMode(mode))
 
         self.cl_set = {}
         self.trayIcon.SignalActSet.connect(self.openMenuSettings)
@@ -54,7 +56,7 @@ class MainClass(QWidget):
         self.upDateListOpenProcces()
         self.timer_is_work = QTimer()
         self.timer_is_work.timeout.connect(lambda: self.ser.writeSerial('ISWORK\n'))
-        self.timer_is_work.setInterval(20000)
+        self.timer_is_work.setInterval(14000)
         self.timer_is_work.start()
         self.ser.setHanglerRead(self.hanglerReadSer)
         self.trayIcon.SignalChangeBluSer.connect(self.ser.changMod)
@@ -118,6 +120,8 @@ class MainClass(QWidget):
         self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
 
     def update_(self, tp=False):
+
+
         """
         #функция вызываеммая таймером и обновляющяя стиль приложения
         :return: None
@@ -133,8 +137,8 @@ class MainClass(QWidget):
                     self.icon_mass = tempp
                     self.ser.clearnQuwewe()
                     self.ser.clearnSend()
-                    if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-                        self.valve_light.updateList(self.icon_mass)
+                    # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
+                    #     self.valve_light.updateList(self.icon_mass)
                     if (self.ser.doesSerWork == 1):
                         print("self.loadIconOnESP(1)--update_")
                         self.loadIconOnESP(1)
@@ -142,6 +146,10 @@ class MainClass(QWidget):
 
 
     def levelVolHandle(self, comand: str) -> None:
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics('lineno')
+        # for stat in top_stats[:80]:  # Показать топ-10 строк по потреблению памяти
+        #     print(stat)
         """
         #обработчик команд из сериал порта и выставляющий нужый уровень громкости
         :param comand: строка с командой типа ''
@@ -169,26 +177,25 @@ class MainClass(QWidget):
                     if session.Process and session.Process.name() == self.icon_mass[i].name:
                         volume = session._ctl.QueryInterface(ISimpleAudioVolume)
                         volume.SetMasterVolume(float(self.icon_mass[i].volume_level) / 100, None)
-                    elif (self.icon_mass[i].name == "system" and str(session)[
-                        -5] == 'DisplayName: @%SystemRoot%\System32\AudioSrv.Dll'):
+                    elif (self.icon_mass[i].name == "system" and str(session)[-5] == 'DisplayName: @%SystemRoot%\System32\AudioSrv.Dll'):
                         volume = session._ctl.QueryInterface(ISimpleAudioVolume)
                         volume.SetMasterVolume(float(self.icon_mass[i].volume_level) / 100, None)
 
-    def handleSignalLIghtMode(self, mode: int):
-        if mode == LIGHT_MODE.WHITE.value:
-            self.__light_mode = LIGHT_MODE.WHITE
-            self.ser.writeSerial("SET_LIGHT:white")
-        if mode == LIGHT_MODE.WAVE.value:
-            self.__light_mode = LIGHT_MODE.WAVE
-            self.ser.writeSerial("SET_LIGHT:wave")
-        if mode == LIGHT_MODE.VOLUME_LEVEL.value:
-            self.__light_mode = LIGHT_MODE.VOLUME_LEVEL
-            self.ser.writeSerial("SET_LIGHT:level_value")
-            self.valve_light = VaveLight(self.icon_mass, self.ser.writeSerial)
-            self.valve_light.avtoUpdateStart()
-        else:
-            if self.valve_light != None:
-                self.valve_light.stop()
+    # def handleSignalLIghtMode(self, mode: int):
+    #     if mode == LIGHT_MODE.WHITE.value:
+    #         self.__light_mode = LIGHT_MODE.WHITE
+    #         self.ser.writeSerial("SET_LIGHT:white")
+    #     if mode == LIGHT_MODE.WAVE.value:
+    #         self.__light_mode = LIGHT_MODE.WAVE
+    #         self.ser.writeSerial("SET_LIGHT:wave")
+    #     if mode == LIGHT_MODE.VOLUME_LEVEL.value:
+    #         self.__light_mode = LIGHT_MODE.VOLUME_LEVEL
+    #         self.ser.writeSerial("SET_LIGHT:level_value")
+    #         self.valve_light = VaveLight(self.icon_mass, self.ser.writeSerial)
+    #         self.valve_light.avtoUpdateStart()
+    #     else:
+    #         if self.valve_light != None:
+    #             self.valve_light.stop()
 
     def startMassege(self):
         """
@@ -211,16 +218,16 @@ class MainClass(QWidget):
         if self.num_load_icon == 0:
             self.timer_setIconNum.start()
 
-            if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-                self.valve_light.avtoUpdateStop()
-                print("avtoUpdateStop")
-                return
+            # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
+            #     self.valve_light.avtoUpdateStop()
+            #     print("avtoUpdateStop")
+            #     return
         print(self.num_load_icon)
         if (self.num_load_icon == 5):
             self.num_load_icon = -1
             self.flag_setIconNum = 0
-            if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-                self.valve_light.avtoUpdateStart()
+            # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
+            #     self.valve_light.avtoUpdateStart()
             return
         self.setIconNum()
 
@@ -233,14 +240,14 @@ class MainClass(QWidget):
         self.ser.writeByteSerial(self.icon_mass[self.num_load_icon].icon)
 
     def exitApp(self):
-        if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-            self.valve_light.stop()
+        # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
+        #     self.valve_light.stop()
         QCoreApplication.exit()
 
 if __name__ == '__main__':
     QCoreApplication.setOrganizationName(ORGANIZATION_NAME)
     QCoreApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
-    QCoreApplication.setApplicationName(APPLICATION_NAME)
+    QCoreApplication.setApplicationName(ORGANIZATION_NAME)
     app = QApplication(sys.argv + ['-platform', 'windows:darkmode=1'])
     app.setQuitOnLastWindowClosed(False)
     window = MainClass()
