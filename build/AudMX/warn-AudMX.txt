@@ -14,14 +14,14 @@ Types if import:
 IMPORTANT: Do NOT post this list to the issue-tracker. Use it as a basis for
             tracking down the missing module yourself. Thanks!
 
-missing module named pwd - imported by posixpath (delayed, conditional, optional), shutil (delayed, optional), tarfile (optional), pathlib._local (optional), subprocess (delayed, conditional, optional), psutil (optional), netrc (delayed, conditional), getpass (delayed, optional)
+missing module named pwd - imported by shutil (delayed, optional), tarfile (optional), pathlib._local (optional), subprocess (delayed, conditional, optional), posixpath (delayed, conditional, optional), psutil (optional), netrc (delayed, conditional), getpass (delayed, optional)
 missing module named grp - imported by shutil (delayed, optional), tarfile (optional), pathlib._local (optional), subprocess (delayed, conditional, optional)
-missing module named 'collections.abc' - imported by logging (top-level), inspect (top-level), typing (top-level), selectors (top-level), tracemalloc (top-level), traceback (top-level), http.client (top-level), typing_extensions (top-level), requests.compat (top-level), asyncio.base_events (top-level), asyncio.coroutines (top-level), bleak (conditional), bleak.backends.client (conditional), bleak.backends.bluezdbus.client (conditional), winrt.system (top-level), bleak.backends.corebluetooth.client (conditional), bleak.backends.winrt.client (conditional)
+missing module named 'collections.abc' - imported by traceback (top-level), inspect (top-level), logging (top-level), typing (top-level), selectors (top-level), tracemalloc (top-level), http.client (top-level), typing_extensions (top-level), requests.compat (top-level), asyncio.base_events (top-level), asyncio.coroutines (top-level), bleak (conditional), bleak.backends.client (conditional), bleak.backends.bluezdbus.client (conditional), winrt.system (top-level), bleak.backends.corebluetooth.client (conditional), bleak.backends.winrt.client (conditional)
 missing module named _posixsubprocess - imported by subprocess (conditional), multiprocessing.util (delayed)
 missing module named fcntl - imported by subprocess (optional), psutil._compat (delayed, optional)
 missing module named _frozen_importlib_external - imported by importlib._bootstrap (delayed), importlib (optional), importlib.abc (optional), zipimport (top-level)
 excluded module named _frozen_importlib - imported by importlib (optional), importlib.abc (optional), zipimport (top-level)
-missing module named posix - imported by os (conditional, optional), posixpath (optional), shutil (conditional), importlib._bootstrap_external (conditional)
+missing module named posix - imported by shutil (conditional), importlib._bootstrap_external (conditional), os (conditional, optional), posixpath (optional)
 missing module named resource - imported by posix (top-level)
 missing module named _posixshmem - imported by multiprocessing.resource_tracker (conditional), multiprocessing.shared_memory (conditional)
 missing module named _scproxy - imported by urllib.request (conditional)
@@ -77,6 +77,5 @@ missing module named 'android.broadcast' - imported by bleak.backends.p4android.
 missing module named 'dbus_fast.signature' - imported by bleak.backends.bluezdbus.client (top-level)
 missing module named android - imported by bleak.backends.p4android.client (top-level)
 missing module named async_timeout - imported by bleak (conditional), bleak.backends.bluezdbus.client (conditional), bleak.backends.p4android.scanner (conditional), bleak.backends.corebluetooth.CentralManagerDelegate (conditional), bleak.backends.winrt.util (conditional), bleak.backends.corebluetooth.PeripheralDelegate (conditional), bleak.backends.winrt.client (conditional)
-missing module named comtypes.gen - imported by comtypes (delayed), comtypes.client._code_cache (delayed, optional), comtypes.client._generate (delayed, conditional), comtypes.client (top-level)
 missing module named 'numpy.ctypeslib' - imported by comtypes._npsupport (delayed, optional)
 missing module named numpy - imported by comtypes._npsupport (delayed, conditional)

@@ -1,4 +1,4 @@
-import gc
+# import gc
 import shutil
 from datetime import datetime
 import sys
@@ -28,7 +28,7 @@ class SimpleLogger:
         self.end_log_marker = end_log_marker
         self.log_file = os.path.join(log_dir, "current_log.txt")
         sys.excepthook = self._log_uncaught_exceptions
-
+        print("Current working directory:", os.getcwd())
         # Создаем директории, если они не существуют
         os.makedirs(self.log_dir, exist_ok=True)
         os.makedirs(self.backup_dir, exist_ok=True)

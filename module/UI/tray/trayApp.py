@@ -17,19 +17,11 @@ class SystemTrayIcon(QSystemTrayIcon):  # класс приложения в т�
 
         print(self.menu.parent())
 
-        # self.menu_light = self.menu.addMenu("light")
         self.settings = self.menu.addAction("setting")
         self.Action2 = self.menu.addAction("set BLU")
         self.exitAction = self.menu.addAction("EXIT")
-        #
-        # self.Action_light1 = self.menu_light.addAction("white")
-        # self.Action_light2 = self.menu_light.addAction("wave")
-        # self.Action_light3 = self.menu_light.addAction("volume_level")
 
         self.setContextMenu(self.menu)
-        # self.Action_light1.triggered.connect(lambda: self.SignalLIghtMode.emit(LIGHT_MODE.WHITE.value))
-        # self.Action_light2.triggered.connect(lambda: self.SignalLIghtMode.emit(LIGHT_MODE.WAVE.value))
-        # self.Action_light3.triggered.connect(lambda: self.SignalLIghtMode.emit(LIGHT_MODE.VOLUME_LEVEL.value))
         self.exitAction.triggered.connect(self.exit)
         self.Action2.triggered.connect(self.action2)
         self.settings.triggered.connect(self.actSet)
@@ -64,4 +56,3 @@ class SystemTrayIcon(QSystemTrayIcon):  # класс приложения в т�
         if self.flag_warning:
             self.showMessage("ERROR BLUETOOTH", "bluet. off")
             self.show()
-            # print("1234")

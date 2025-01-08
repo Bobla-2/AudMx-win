@@ -36,9 +36,7 @@ class MainClass(QWidget):
         # tracemalloc.start()
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
-        # self.trayIcon.menu_light.setStyleSheet("border-radius: 10px;")
         self.trayIcon.flag_warning = MenuSettings.readVarningMode(SETTINGS_TRAY)
-        # self.trayIcon.SignalLIghtMode.connect(lambda mode: self.handleSignalLIghtMode(mode))
 
         self.cl_set = {}
         self.trayIcon.SignalActSet.connect(self.openMenuSettings)
@@ -85,7 +83,7 @@ class MainClass(QWidget):
         else:
             del self.menu
     def openMenuSettings(self):
-        self.menu = MenuSettings(SETTINGS_TRAY, APPLICATION_NAME, self.setSettings)
+        self.menu = MenuSettings(SETTINGS_TRAY, ORGANIZATION_NAME, self.setSettings)
         self.avto_udate_theme = AutoUpdateStile()
         self.avto_udate_theme.appendedCallback(self.menu.dialog.setStyleSheet, ":/qss/W_sylete",
                                                ":/qss/B_sylete", "CSS")
@@ -103,12 +101,10 @@ class MainClass(QWidget):
         elif iner.find("OK") != -1:
             if self.num_load_icon != -1:
                 if self.flag_setIconNum == 1:
-                    # print("self.loadIconOnESP(1)--hanglerReadSer")
                     self.loadIconOnESP(1)
         elif iner.find("ERROR: -1") != -1:
             if self.flag_setIconNum == 1:
                 if self.num_load_icon != -1:
-                    # print("self.loadIconOnESP(0)--hanglerReadSer")
                     self.loadIconOnESP(0)
         elif iner.find("Send 352 bytes") != -1:
             print("iner.find(Send 352 bytes)")
@@ -120,8 +116,6 @@ class MainClass(QWidget):
         self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
 
     def update_(self, tp=False):
-
-
         """
         #функция вызываеммая таймером и обновляющяя стиль приложения
         :return: None
@@ -177,25 +171,10 @@ class MainClass(QWidget):
                     if session.Process and session.Process.name() == self.icon_mass[i].name:
                         volume = session._ctl.QueryInterface(ISimpleAudioVolume)
                         volume.SetMasterVolume(float(self.icon_mass[i].volume_level) / 100, None)
-                    elif (self.icon_mass[i].name == "system" and str(session)[-5] == 'DisplayName: @%SystemRoot%\System32\AudioSrv.Dll'):
+                    elif (self.icon_mass[i].name == "system" and str(session)[-5] ==
+                          'DisplayName: @%SystemRoot%\\System32\\AudioSrv.Dll'):
                         volume = session._ctl.QueryInterface(ISimpleAudioVolume)
                         volume.SetMasterVolume(float(self.icon_mass[i].volume_level) / 100, None)
-
-    # def handleSignalLIghtMode(self, mode: int):
-    #     if mode == LIGHT_MODE.WHITE.value:
-    #         self.__light_mode = LIGHT_MODE.WHITE
-    #         self.ser.writeSerial("SET_LIGHT:white")
-    #     if mode == LIGHT_MODE.WAVE.value:
-    #         self.__light_mode = LIGHT_MODE.WAVE
-    #         self.ser.writeSerial("SET_LIGHT:wave")
-    #     if mode == LIGHT_MODE.VOLUME_LEVEL.value:
-    #         self.__light_mode = LIGHT_MODE.VOLUME_LEVEL
-    #         self.ser.writeSerial("SET_LIGHT:level_value")
-    #         self.valve_light = VaveLight(self.icon_mass, self.ser.writeSerial)
-    #         self.valve_light.avtoUpdateStart()
-    #     else:
-    #         if self.valve_light != None:
-    #             self.valve_light.stop()
 
     def startMassege(self):
         """
@@ -210,24 +189,20 @@ class MainClass(QWidget):
         self.num_load_icon = -1
 
     def loadIconOnESP(self, ans=0):
-        print(self.num_load_icon)
+        # print(self.num_load_icon)
         self.num_load_icon = self.num_load_icon + ans
-        print(self.num_load_icon)
+        # print(self.num_load_icon)
         if self.num_load_icon == -1:
             return
         if self.num_load_icon == 0:
+            self.timer_is_work.stop()
             self.timer_setIconNum.start()
-
-            # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-            #     self.valve_light.avtoUpdateStop()
-            #     print("avtoUpdateStop")
-            #     return
         print(self.num_load_icon)
         if (self.num_load_icon == 5):
+            self.timer_is_work.start()
+            self.ser.writeSerial("ISWORK\n")
             self.num_load_icon = -1
             self.flag_setIconNum = 0
-            # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-            #     self.valve_light.avtoUpdateStart()
             return
         self.setIconNum()
 
@@ -240,8 +215,6 @@ class MainClass(QWidget):
         self.ser.writeByteSerial(self.icon_mass[self.num_load_icon].icon)
 
     def exitApp(self):
-        # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-        #     self.valve_light.stop()
         QCoreApplication.exit()
 
 if __name__ == '__main__':
