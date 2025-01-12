@@ -1,4 +1,3 @@
-# import gc
 import shutil
 from datetime import datetime
 import sys

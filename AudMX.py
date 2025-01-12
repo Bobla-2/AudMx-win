@@ -2,6 +2,7 @@ from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume, IAudioEndpointVolume
 import sys
 import win32con
 import win32api
+import os
 # import tracemalloc
 
 from PySide6.QtWidgets import QApplication, QWidget
@@ -222,6 +223,7 @@ if __name__ == '__main__':
     QCoreApplication.setOrganizationDomain(ORGANIZATION_DOMAIN)
     QCoreApplication.setApplicationName(ORGANIZATION_NAME)
     app = QApplication(sys.argv + ['-platform', 'windows:darkmode=1'])
+    os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
     app.setQuitOnLastWindowClosed(False)
     window = MainClass()
     sys.exit(app.exec())

@@ -73,7 +73,7 @@
  [],
  False,
  False,
- 1736179909,
+ 1736679925,
  [('runw.exe',
    'C:\\Users\\savva\\miniconda3\\envs\\AudMX_3_13\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
    'EXECUTABLE')],
