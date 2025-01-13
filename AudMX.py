@@ -4,6 +4,8 @@ import win32con
 import win32api
 import os
 # import tracemalloc
+from psutil import NoSuchProcess, AccessDenied
+from module.logger.logger import SimpleLogger
 
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import QTimer, QCoreApplication
@@ -34,6 +36,7 @@ class MainClass(QWidget):
     valve_light = None
     def __init__(self):
         super().__init__()
+        self.__logger = SimpleLogger()
         # tracemalloc.start()
         self.trayIcon = SystemTrayIcon(self)
         self.trayIcon.show()
@@ -113,9 +116,31 @@ class MainClass(QWidget):
         elif iner.find("bluet") != -1:
             self.trayIcon.masegeWarningBLE()
 
-    def upDateListOpenProcces(self):
-        self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
+    # def upDateListOpenProcces(self):
+    #     self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
 
+
+
+    def upDateListOpenProcces(self):
+        open_process_list = []
+        for session in AudioUtilities.GetAllSessions():
+            if session.Process:
+                try:
+                    if session.Process.status() == 'running':
+                        process_name = session.Process.name()
+                        process_pid = session.Process.pid
+                        open_process_list.append([process_name, process_pid])
+                except NoSuchProcess:
+                    continue
+                except AccessDenied:
+                    continue
+                except Exception as e:
+                    # Логируем другие неожиданные ошибки
+                    print(f"Ошибка при обработке процесса: {e}")
+                    continue
+        # Добавляем статичные значения
+        open_process_list.extend([["master.exe", -1], ["system.exe", -1]])
+        self.open_process_list = open_process_list
     def update_(self, tp=False):
         """
         #функция вызываеммая таймером и обновляющяя стиль приложения
