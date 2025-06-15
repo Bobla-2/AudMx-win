@@ -9,7 +9,7 @@ from module.UI_manager.theme.windows_thames import AutoUpdateStile
 from PySide6.QtCore import QCoreApplication
 import platform
 
-APPLICATION_NAME = 'AudMX v1.5'
+APPLICATION_NAME = 'AudMX v1.6'
 def singleton(cls):
     instances = {}
     def get_instance(*args, **kwargs):
@@ -110,6 +110,10 @@ class CrashMenu():
     def __close(self):
         self.auto_udate_theme.removeCallback(self.__msgBox.setStyleSheet)
         self.__msgBox.close()
+        dirpath = list(walk("logs_backup"))
+        backup_files = [os.path.join(dirpath[0][0], dir) for dir in dirpath[0][2]]
+        for file in backup_files:
+            os.remove(file)
         for i in reversed(range(self.__layout.count())):
             widget = self.__layout.itemAt(i).widget()
             if widget is not None:

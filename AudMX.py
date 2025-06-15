@@ -1,7 +1,6 @@
-from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume, IAudioEndpointVolume
+from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume
+from module.audio_utils import get_all_sessions_all_devices, set_all_master_volume
 import sys
-import win32con
-import win32api
 import os
 # import tracemalloc
 from psutil import NoSuchProcess, AccessDenied
@@ -9,14 +8,13 @@ from module.logger.logger import SimpleLogger
 
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import QTimer, QCoreApplication
-from comtypes import CLSCTX_ALL
-from Bobla_lib.icon_manager import IcomReader #, VaveLight
+
+from Bobla_lib.icon_manager import IcomReader
 from Bobla_lib.setting_menu import MenuSettings
 from Bobla_lib.serial_blu import ConectAudMX
 from Bobla_lib.setting_menu_button import MenuSettingsButtonModule, ButtonModuleFunc
 from module.UI_manager.theme.windows_thames import AutoUpdateStile
 from module.UI.tray.trayApp import SystemTrayIcon
-from module.ENUM.enums import dictVolumeDBtoProsent# LIGHT_MODE,
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
@@ -119,8 +117,6 @@ class MainClass(QWidget):
     # def upDateListOpenProcces(self):
     #     self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
 
-
-
     def upDateListOpenProcces(self):
         open_process_list = []
         for session in AudioUtilities.GetAllSessions():
@@ -141,6 +137,7 @@ class MainClass(QWidget):
         # Добавляем статичные значения
         open_process_list.extend([["master.exe", -1], ["system.exe", -1]])
         self.open_process_list = open_process_list
+
     def update_(self, tp=False):
         """
         #функция вызываеммая таймером и обновляющяя стиль приложения
@@ -180,7 +177,7 @@ class MainClass(QWidget):
         comand = comand.split("|")
         if (len(comand) != 5):
             return
-        self.audioSessions = AudioUtilities.GetAllSessions()
+        self.audioSessions = get_all_sessions_all_devices()
         for i in range(5):
             if self.icon_mass[i].name == "":
                 return
@@ -188,10 +185,7 @@ class MainClass(QWidget):
             if self.icon_mass[i].last_volume_level != self.icon_mass[i].volume_level:
                 self.icon_mass[i].last_volume_level = self.icon_mass[i].volume_level
                 if self.icon_mass[i].name == "master.exe":
-                    devices = AudioUtilities.GetSpeakers()
-                    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-                    volume = interface.QueryInterface(IAudioEndpointVolume)
-                    volume.SetMasterVolumeLevel(dictVolumeDBtoProsent[self.icon_mass[i].volume_level], None)
+                    set_all_master_volume(self.icon_mass[i].volume_level / 100)
                     continue
                 for session in self.audioSessions:
                     if session.Process and session.Process.name() == self.icon_mass[i].name:
