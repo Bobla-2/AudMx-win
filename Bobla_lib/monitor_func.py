@@ -43,6 +43,7 @@ class Monitor(metaclass=Singleton):
             if self.__list_window[num][0] == window:
                 del self.__list_window[num]
                 break
+
     def __editSize(self, screen_name: str) -> None:
         return
         self.__font = QtGui.QFont()

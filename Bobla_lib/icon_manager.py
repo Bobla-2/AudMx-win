@@ -21,9 +21,12 @@ class IconCl(object):
         self._last_volume_level: int = 0
         self._socket = None  # тип объекта сокета не указан
         self._pid: int = -1
+        try:
+            if path:
+                self._name = path.split("_")[-1].replace("bmp","exe")
+        except Exception as e:
+            self._name = "error"
 
-        if path:
-            self._name = path[path.rindex("__") + 2:-3] + "exe"
     @property
     def icon(self) -> bytes:
         """
@@ -100,6 +103,7 @@ class IcomReader():
             __icon_mass.append(IconCl(None, len(__icon_mass)))
 
         return __icon_mass
+
     @staticmethod
     def __processFolder(folder_path: str, poccess_list: list, irq_massege) -> list[bytes]:
         """
@@ -122,6 +126,7 @@ class IcomReader():
                 for it in poccess_list:
                     if tmp.name == it[0]:
                         tmp.pid = it[1]
+                        break
 
                 if tmp.name in name_list_open:
                     if (not type(tmp.icon) is None or len(tmp.icon) == 352):

@@ -11,11 +11,11 @@ class SystemTrayIcon(QSystemTrayIcon):  # класс приложения в т�
     SignalButtonExit = Signal()
 
     def __init__(self, parent=None):
-        QSystemTrayIcon.__init__(self, parent)
+        super().__init__(parent)
         self.setToolTip("AudMX")
         self.menu = QMenu(parent)
 
-        print(self.menu.parent())
+        # print(self.menu.parent())
 
         self.settings = self.menu.addAction("setting")
         self.Action2 = self.menu.addAction("set BLU")

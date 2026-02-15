@@ -39,6 +39,7 @@ class seriall(QObject):
         self.__timer_avto_connect.setInterval(1500)
         self.__timer_avto_connect.start()
         self.__flag_reconnect = reconnect
+
     def __handleError(self, error):
         if error == QSerialPort.NoError:
             return
@@ -147,10 +148,10 @@ class SerCDC(seriall):
         self.__timer_cdc = QTimer()
         self.__timer_cdc.timeout.connect(self.__load64Byte)
         self.__timer_cdc.setInterval(10)
-        if watch_dog:
-            self.watch_dog = QTimer()
-            self.watch_dog.timeout.connect(self.watchDog)
-            self.watch_dog.setInterval(10000)
+        # if watch_dog:
+        self.watch_dog = QTimer()
+        self.watch_dog.timeout.connect(self._seriall__handleError(QSerialPort.ResourceError))
+        self.watch_dog.setInterval(10000)
     @property
     def mod_CDC(self):
         return self.__flag_cdc

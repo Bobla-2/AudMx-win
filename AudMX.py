@@ -20,6 +20,7 @@ ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
 APPLICATION_NAME = 'AudMX v1.5'
 SETTINGS_TRAY = 'settings'
+APPLICATION_VERSION = '1.6.1'
 
 class MainClass(QWidget):
     volLevelApp = []
@@ -151,11 +152,10 @@ class MainClass(QWidget):
                 self.last_process_list = self.open_process_list
                 tempp = IcomReader.loadIcons(sys.argv[0][:sys.argv[0].rindex("\\")] + ".\\icon", self.open_process_list, 5)
                 if ((i.name for i in tempp) != (i.name for i in self.icon_mass)):
+
                     self.icon_mass = tempp
                     self.ser.clearnQuwewe()
                     self.ser.clearnSend()
-                    # if self.__light_mode == LIGHT_MODE.VOLUME_LEVEL:
-                    #     self.valve_light.updateList(self.icon_mass)
                     if (self.ser.doesSerWork == 1):
                         print("self.loadIconOnESP(1)--update_")
                         self.loadIconOnESP(1)
@@ -168,8 +168,8 @@ class MainClass(QWidget):
         # for stat in top_stats[:80]:  # Показать топ-10 строк по потреблению памяти
         #     print(stat)
         """
-        #обработчик команд из сериал порта и выставляющий нужый уровень громкости
-        :param comand: строка с командой типа ''
+        #обработчик команд из сериал порта и выставляющий нужный уровень громкости
+        :param comand: строка с командой типа '0-1024|0-1024|0-1024|0-1024|0-1024'
         :return: NONE
         """
         if not self.icon_mass:
