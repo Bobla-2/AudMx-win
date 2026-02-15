@@ -23,7 +23,7 @@ class IconCl(object):
         self._pid: int = -1
         try:
             if path:
-                self._name = path.split("_")[-1].replace("bmp","exe")
+                self._name = [st for st in path.split("_") if st][-1].replace("bmp","exe")
         except Exception as e:
             self._name = "error"
 
