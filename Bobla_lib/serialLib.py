@@ -111,7 +111,7 @@ class seriall(QObject):
 
         try:
             self.__logger.log(f"__handleRead read:  {self.__inputSrt}")
-            print("__handleRead read: ", self.__inputSrt)
+            # print("__handleRead read: ", self.__inputSrt)
             self.__handleRead(self.__inputSrt)
 
         except:

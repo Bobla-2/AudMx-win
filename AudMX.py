@@ -1,9 +1,12 @@
-from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume
+from pycaw.pycaw import ISimpleAudioVolume
+from pycaw.pycaw import AudioUtilities, IAudioSessionManager2, IAudioSessionControl2
+from comtypes import CLSCTX_ALL
+from pycaw.constants import EDataFlow, DEVICE_STATE
 from module.audio_utils import get_all_sessions_all_devices, set_all_master_volume
 import sys
 import os
 # import tracemalloc
-from psutil import NoSuchProcess, AccessDenied
+from psutil import NoSuchProcess, AccessDenied, Process
 from module.logger.logger import SimpleLogger
 
 from PySide6.QtWidgets import QApplication, QWidget
@@ -18,9 +21,10 @@ from module.UI.tray.trayApp import SystemTrayIcon
 
 ORGANIZATION_NAME = 'AudMX'
 ORGANIZATION_DOMAIN = ''
-APPLICATION_NAME = 'AudMX v1.5'
+APPLICATION_NAME = 'AudMX v1.6'
 SETTINGS_TRAY = 'settings'
-APPLICATION_VERSION = '1.6.1'
+APPLICATION_VERSION = '1.6.2'
+
 
 class MainClass(QWidget):
     volLevelApp = []
@@ -75,7 +79,6 @@ class MainClass(QWidget):
         self.setSettings(MenuSettingsButtonModule.readBTMode(SETTINGS_TRAY))
 
     def setSettings(self, set: dict):
-
         if 'warning' in set:
             self.trayIcon.flag_warning = set["warning"]
         if 'theme' in set:
@@ -85,13 +88,13 @@ class MainClass(QWidget):
             # del self.menu._button_menu
         else:
             del self.menu
+
     def openMenuSettings(self):
         self.menu = MenuSettings(SETTINGS_TRAY, ORGANIZATION_NAME, self.setSettings)
         self.avto_udate_theme = AutoUpdateStile()
         self.avto_udate_theme.appendedCallback(self.menu.dialog.setStyleSheet, ":/qss/W_sylete",
                                                ":/qss/B_sylete", "CSS")
         self.avto_udate_theme.removeCallback(self.menu.dialog.setStyleSheet)
-
 
     def hanglerReadSer(self, iner: str):
         # print("hanglerReadSer:  " + iner)
@@ -117,26 +120,84 @@ class MainClass(QWidget):
 
     # def upDateListOpenProcces(self):
     #     self.open_process_list = [[session.Process.name(), session.Process.pid] for session in AudioUtilities.GetAllSessions() if session.Process] + [["master.exe", -1], ["system.exe", -1]]
+    # def upDateListOpenProcces(self):
+    #     open_process_list = []
+    #     for session in AudioUtilities.GetAllSessions():
+    #         if session.Process:
+    #             try:
+    #                 if session.Process.status() == 'running':
+    #                     process_name = session.Process.name()
+    #                     process_pid = session.Process.pid
+    #                     open_process_list.append([process_name, process_pid])
+    #             except NoSuchProcess:
+    #                 continue
+    #             except AccessDenied:
+    #                 continue
+    #             except Exception as e:
+    #                 # Логируем другие неожиданные ошибки
+    #                 print(f"Ошибка при обработке процесса: {e}")
+    #                 continue
+    #     # Добавляем статичные значения
+    #     open_process_list.extend([["master.exe", -1], ["system.exe", -1]])
+    #     self.open_process_list = open_process_list
+
+    from pycaw.pycaw import AudioUtilities, IAudioSessionManager2
+    from pycaw.constants import EDataFlow, DEVICE_STATE
+    from comtypes import CLSCTX_ALL
+    from psutil import NoSuchProcess, AccessDenied
 
     def upDateListOpenProcces(self):
         open_process_list = []
-        for session in AudioUtilities.GetAllSessions():
-            if session.Process:
+        seen_pid = set()
+        try:
+            enumerator = AudioUtilities.GetDeviceEnumerator()
+            devices = enumerator.EnumAudioEndpoints(
+                0,
+                1
+            )
+            for i in range(devices.GetCount()):
                 try:
-                    if session.Process.status() == 'running':
-                        process_name = session.Process.name()
-                        process_pid = session.Process.pid
-                        open_process_list.append([process_name, process_pid])
-                except NoSuchProcess:
+                    device = devices.Item(i)
+                    manager = device.Activate(
+                        IAudioSessionManager2._iid_,
+                        CLSCTX_ALL,
+                        None
+                    )
+
+                    session_manager = manager.QueryInterface(IAudioSessionManager2)
+                    session_enum = session_manager.GetSessionEnumerator()
+
+                    for j in range(session_enum.GetCount()):
+                        try:
+                            session = session_enum.GetSession(j)
+                            ctl2 = session.QueryInterface(IAudioSessionControl2)
+                            pid = ctl2.GetProcessId()
+
+                            if pid == 0 or pid in seen_pid:
+                                continue
+
+                            seen_pid.add(pid)
+                            try:
+                                proc = Process(pid)
+                                if proc.status() == "running":
+                                    open_process_list.append([
+                                        proc.name(),
+                                        proc.pid
+                                    ])
+
+                            except (NoSuchProcess, AccessDenied):
+                                continue
+                        except Exception:
+                            continue
+                except Exception:
                     continue
-                except AccessDenied:
-                    continue
-                except Exception as e:
-                    # Логируем другие неожиданные ошибки
-                    print(f"Ошибка при обработке процесса: {e}")
-                    continue
-        # Добавляем статичные значения
-        open_process_list.extend([["master.exe", -1], ["system.exe", -1]])
+        except Exception as e:
+            print(f"Ошибка перечисления устройств: {e}")
+
+        open_process_list.extend([
+            ["master.exe", -1],
+            ["system.exe", -1]
+        ])
         self.open_process_list = open_process_list
 
     def update_(self, tp=False):
@@ -159,8 +220,6 @@ class MainClass(QWidget):
                     if (self.ser.doesSerWork == 1):
                         print("self.loadIconOnESP(1)--update_")
                         self.loadIconOnESP(1)
-
-
 
     def levelVolHandle(self, comand: str) -> None:
         # snapshot = tracemalloc.take_snapshot()
